@@ -1,0 +1,135 @@
+<html>
+<head>
+	<title>Belen Bookmarklets</title>
+
+	<script type="text/javascript">
+	// Here are the human-readable versions of the bookmarklets below, included for the benefit of any future hackers who may wish to extend or modify them.
+	// The bookmarklets are essentially this code, run through a minifier. I have made a couple of minor changes here for the sake of readability:
+	//   * I have added semicolons at the end of each statement
+	//   * Some long strings have been broken up onto multiple lines
+	// Original code by Sylvan Mably (sylvan@gumtree.com).
+		
+		// Make the keyword field accept 200 characters (instead of 20) and turn it green as a hint to the user
+		function extendKeywordField() {
+			if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
+
+				// If an element exists with id "srch-kwrd", set its max length to 200 and its background colour to green
+				var k = $('#srch-kwrd');
+				if (k) {
+					k.attr('maxlength', '200');
+					k.css('background-color', '#DFD');
+				}
+			}
+		}
+
+		// Add links to the ad ID, machine ID, and phone number for each ad
+		function linkify() {
+			if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
+
+				// Find the first dd sibling of each dt containing the text "Ad-Id:"
+				$('dt:contains(\'Ad-Id:\') + dd').html(
+
+					// Set the HTML in each of said dd elements according to the following rule:
+					// If the first character of the text inside the dd is a left angle bracket, we have already added a link here, so do nothing;
+					// Otherwise, wrap the text in link tags
+					function (i, v) {
+						if (v.charAt(0) == '<') { return v; }
+						else { return '<a href=\'?formAction=submitSearch&idAndEmailField=' + v + '\' target=\'_blank\'>' + v + '</a>'; }
+					}
+				);
+
+				// Same logic as above, for machine ID
+				$('dt:contains(\'Machine Id:\') + dd div').html(
+					function (i, v) {
+						if (v.charAt(0) == '<') { return v; }
+						else { return '<a href=\'?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH&machId=' + v + '\' target=\'_blank\'>' + v + '</a>'; }
+					}
+				);
+
+				// Same logic as above, for phone number
+				$('dt:contains(\'Phone:\') + dd').html(
+					function (i, v) {
+						if (v.charAt(0) == '<') { return v; }
+						else { return '<a href=\'?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH&searchRequest.keyword=' + v + '\' target=\'_blank\'>' + v + '</a>'; }
+					}
+				);
+			}
+		}
+
+
+		// Highlight all ad from unregistered users with only one ad posted
+		function hlNewUnreg() {
+			if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
+
+				// Find all adRow tr elements that have a child element of class "meta-usrads-pstd" in which the text is precisely "1"
+				$('tr.adRow').has(
+					$('.meta-usrads-pstd').filter(function() { return $(this).text() == '1'; })
+
+				// Then, from that set of tr elements, select only those that have a child dd element of class "meta-user-status" that contains the text "Unregistered"
+				).filter(
+					$('tr.adRow').has($('dd.meta-user-status:contains(\'Unregistered\')'))
+
+				// To those matching tr elements, apply a red background colour
+				).css('background-color','#FAA');
+			}
+		}
+
+		// Open a window with the current search parameters embedded in the query string
+		function createSearchPermalink() {
+			if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
+
+				// Open a window with the Belen search URL, followed by...
+				window.open('http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&' +
+
+					// ...the serialization of all inputs under the searchForm from the set of fields we care about
+					// (Discarding any with the blank or default value, as we want to minimize the length of the URL)
+					$('#searchForm :' +
+						'[name=\'categoryId1stLevel\'],' + 
+						'[name=\'categoryId2ndLevel\'][value!=\'\'],' +
+						'[name=\'searchRequest.scoreGroups\'],' +
+						'[name=\'searchRequest.activeFeatureTypes\'],' +
+						'[name=\'purchaseOrderId\'][value!=\'\'],' +
+						'[name=\'searchRequest.groupedAdState\'],' +
+						'[name=\'searchRequest.dateRangeType\'][value!=\'LAST_WEEK\'],' +
+						'[name=\'idAndEmailField\'][value!=\'\'],' +
+						'[name=\'machId\'][value!=\'\'],' +
+						'[name=\'paymentTransactionId\'][value!=\'\'],' +
+						'[name=\'searchRequest.ip\'][value!=\'\'],' +
+						'[name=\'searchRequest.keyword\'][value!=\'\'],' +
+						'[name=\'searchRequest.agent\'][value!=\'\'],' +
+						'[name=\'searchRequest.flagType\'][value!=\'\'],' +
+						'[name=\'searchRequest.appealType\'][value!=\'IGNORE\']'
+					).serialize()
+				);
+			}
+		}
+
+	</script>
+
+</head>
+<body>
+
+	<h1>Belen Bookmarklets</h1>
+
+	<p>Drag the following links onto your bookmarks bar to use while in Belen:
+
+	<ul>
+		<li><a href="javascript:(function(){if(location['host']+location['pathname']=='cs.gumtree.com.au/searchAds.do'){window.open('http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&'+$('#searchForm :[name=\'categoryId1stLevel\'],[name=\'categoryId2ndLevel\'][value!=\'\'],[name=\'searchRequest.scoreGroups\'],[name=\'searchRequest.activeFeatureTypes\'],[name=\'purchaseOrderId\'][value!=\'\'],[name=\'searchRequest.groupedAdState\'],[name=\'searchRequest.dateRangeType\'][value!=\'LAST_WEEK\'],[name=\'idAndEmailField\'][value!=\'\'],[name=\'machId\'][value!=\'\'],[name=\'paymentTransactionId\'][value!=\'\'],[name=\'searchRequest.ip\'][value!=\'\'],[name=\'searchRequest.keyword\'][value!=\'\'],[name=\'searchRequest.agent\'][value!=\'\'],[name=\'searchRequest.flagType\'][value!=\'\'],[name=\'searchRequest.appealType\'][value!=\'IGNORE\']').serialize())}})()">Belen search permalink</a>
+		<li><b><a href="javascript:(function(){if(location['host']+location['pathname']=='cs.gumtree.com.au/searchAds.do'){var k=$('#srch-kwrd');if(k){k.attr('maxlength','200');k.css('background-color','#DFD')};$('dt:contains(\'Ad-Id:\') + dd').html(function(i,v){if(v.charAt(0)=='<'){return v}else{return'<a href=\'?formAction=submitSearch&idAndEmailField='+v+'\' target=\'_blank\'>'+v+'</a>'}});$('dt:contains(\'Machine Id:\') + dd div').html(function(i,v){if(v.charAt(0)=='<'){return v}else{return'<a href=\'?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH&machId='+v+'\' target=\'_blank\'>'+v+'</a>'}});$('dt:contains(\'Phone:\') + dd').html(function(i,v){if(v.charAt(0)=='<'){return v}else{return'<a href=\'?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH&searchRequest.keyword='+v+'\' target=\'_blank\'>'+v+'</a>'}});$('tr.adRow').has($('.meta-usrads-pstd').filter(function(){return $(this).text()=='1'})).filter($('tr.adRow').has($('dd.meta-user-status:contains(\'Unregistered\')'))).css('background-color','#FAA')}})()">Belen++ 1.0</a></b>
+
+		<!-- These three are included in Belen++. There's not much point keeping them around as individual bookmarklets, but I have preserved them for posterity nonetheless. Move along, folks, nothing to see here. -->
+		<!--
+		<li><a href="javascript:(function(){if(location['host']+location['pathname']=='cs.gumtree.com.au/searchAds.do'){var k=$('#srch-kwrd');if(k){k.attr('maxlength','200');k.css('background-color','#DFD')}}})()">Extend keyword field</a>
+		<li><a href="javascript:(function(){if(location['host']+location['pathname']=='cs.gumtree.com.au/searchAds.do'){$('dt:contains(\'Ad-Id:\') + dd').html(function(i,v){if(v.charAt(0)=='<'){return v}else{return'<a href=\'?formAction=submitSearch&idAndEmailField='+v+'\' target=\'_blank\'>'+v+'</a>'}});$('dt:contains(\'Machine Id:\') + dd div').html(function(i,v){if(v.charAt(0)=='<'){return v}else{return'<a href=\'?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH&machId='+v+'\' target=\'_blank\'>'+v+'</a>'}});$('dt:contains(\'Phone:\') + dd').html(function(i,v){if(v.charAt(0)=='<'){return v}else{return'<a href=\'?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH&searchRequest.keyword='+v+'\' target=\'_blank\'>'+v+'</a>'}})}})()">Linkify machine ID</a>
+		<li><a href="javascript:(function(){if(location['host']+location['pathname']=='cs.gumtree.com.au/searchAds.do'){$('tr.adRow').has($('.meta-usrads-pstd').filter(function(){return $(this).text()=='1'})).filter($('tr.adRow').has($('dd.meta-user-status:contains(\'Unregistered\')'))).css('background-color','#FAA')}})()">Highlight new+unreg</a>
+		-->
+
+		<!-- And yeahhh... This one is kind of questionable. It works (ish) but definitely needs a bit more time in the oven. -->
+		<!--
+		<li><a href="javascript:(function(){if(location['host']+location['pathname']=='cs.gumtree.com.au/searchAds.do'){$('a.a-adimg').attr('href',function(i,val){return val.replace('_23','_20')})}})()">Show larger images</a>
+		-->
+
+	</ul>
+
+</body>
+</html>
