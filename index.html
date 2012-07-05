@@ -56,21 +56,23 @@
 			}
 		}
 
-
-		// Highlight all ad from unregistered users with only one ad posted
-		function hlNewUnreg() {
+		// Highlight ads from first-time posters and colour-code user state
+		function hlUserRisks() {
 			if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
 
 				// Find all adRow tr elements that have a child element of class "meta-usrads-pstd" in which the text is precisely "1"
 				$('tr.adRow').has(
 					$('.meta-usrads-pstd').filter(function() { return $(this).text() == '1'; })
 
-				// Then, from that set of tr elements, select only those that have a child dd element of class "meta-user-status" that contains the text "Unregistered"
-				).filter(
-					$('tr.adRow').has($('dd.meta-user-status:contains(\'Unregistered\')'))
+				// To those matching tr elements, apply a blue background colour (these are our first-time posters)
+				).css('background-color', '#E3EDFA');
 
-				// To those matching tr elements, apply a red background colour
-				).css('background-color','#FAA');
+				// Give unregistered users a red background colour
+				$('dd.meta-user-status:contains(\', Unregistered\')').css('background-color', '#FCC');
+
+				// Give registered users a green background colour
+				$('dd.meta-user-status:contains(\', Registered\')').css('background-color', '#CEC');
+						
 			}
 		}
 
