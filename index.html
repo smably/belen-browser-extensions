@@ -53,6 +53,9 @@
 						else { return '<a href=\'?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH&searchRequest.keyword=' + v + '\' target=\'_blank\'>' + v + '</a>'; }
 					}
 				);
+
+				// Add blocked class onto all links inside a blocked dd (preserves red highlighted on blocked machine IDs)
+				$('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
 			}
 		}
 
