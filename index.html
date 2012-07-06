@@ -58,18 +58,39 @@
 			if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
 
 				// Find all adRow tr elements that have a child element of class "meta-usrads-pstd" in which the text is precisely "1"
-				$('tr.adRow').has(
-					$('.meta-usrads-pstd').filter(function() { return $(this).text() == '1'; })
-
 				// To those matching tr elements, apply a blue background colour (these are our first-time posters)
-				).css('background-color', '#E3EDFA');
+				$('tr.adRow').has($('.meta-usrads-pstd').filter(function() { return $(this).text() == '1'; })).css('background-color', '#E3EDFA');
 
-				// Give unregistered users a red background colour
-				$('dd.meta-user-status:contains(\', Unregistered\')').css('background-color', '#FCC');
+				// Highlight all scores in red, unless they're 0, in which case make them green
+				$('dd.meta-scr').css('padding', '1px').css('background-color', '#FCB').filter(function() { return $(this).text().trim() == '0'; }).css('background-color', '#CEB');
 
-				// Give registered users a green background colour
-				$('dd.meta-user-status:contains(\', Registered\')').css('background-color', '#CEC');
+				// Highlight live (tested) ad status in green
+				$('.meta-status:contains(\'Live \(Tested\)\')').css('background-color', '#CEB');
+
+				// Highlight, live (untested), blocked, and deleted ad status in red
+				$('.meta-status:contains(\'Live \(Untested\)\'),.meta-status:contains(\'Blocked\'),.meta-status:contains(\'Deleted \(Admin\)\')').css('background-color', '#FCB');
+
+				// Make phone numbers green
+				$('dt:contains(\'Phone:\') + dd').css('background-color', '#CEB');
 						
+				// Give active, registered users a green background colour and everyone else red
+				$('dd.meta-user-status').css('background-color', '#FCB').filter('dd.meta-user-status:contains(\'Active \(User\), Registered\')').css('background-color', '#CEB');
+
+				// Change background colour of email address matching regex r to colour c
+				var f = function(r, c) { $('.meta-email :first-child').filter(function() { return r.test( $(this).text() ); }).css('padding', '1px').css('background-color', c) };
+
+				// Highlight freemail domains in red
+				f(/@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i, '#FCB');
+
+				// Highlight ISP domains in green
+				f(/@(.+\.edu.au|aapt\.net\.au|bigpond\.(com|net)(\.au)?|dodo\.com\.au|iinet\.net\.au|intas\.net\.au|internode\.on\.net|iprimus\.com\.au|netspace\.net\.au|optusnet\.com\.au|ozemail\.com\.au|tadaust\.org\.au|tpg\.com\.au|uplink.net.au|virginbroadband.com.au|westnet\.com\.au)$/i, '#CEB');
+
+				// Highlight users with at least one ok ad in green
+				$('dd.meta-user-history').has($('.meta-usrads-ok').filter(function() { return $(this).text() != '0'; })).css('padding', '1px').css('background-color', '#CEB');
+
+				// Highlight users with at least one bad ad in red
+				$('dd.meta-user-history').has($('.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })).css('padding', '1px').css('background-color', '#FCB');
+
 			}
 		}
 
