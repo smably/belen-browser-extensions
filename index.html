@@ -61,39 +61,23 @@
 				// To those matching tr elements, apply a blue background colour (these are our first-time posters)
 				$('tr.adRow').has($('span.meta-usrads-pstd').filter(function() { return $(this).text() == '1'; })).css('background-color', '#E3EDFA');
 
-				// Highlight all scores in red, unless they're 0, in which case make them green
-				$('dd.meta-scr').css('padding', '1px 2px').css('background-color', '#FCB').filter(function() { return $(this).text().trim() == '0'; }).css('background-color', '#CEB');
+				// Function to highlight an element in red (accepts a jQuery object returns nothing)
+				var h = function(e) { e.css('padding', '1px 2px').css('background-color', '#FCB') };
 
-				// Highlight live (tested) ad status in green
-				$('dd.meta-status:contains(\'Live \(Tested\)\')').css('padding', '1px 2px').css('background-color', '#CEB');
+				// Highlight all scores >0
+				h($('dd.meta-scr').filter(function() { return $(this).text().trim() != '0'; }));
 
 				// Highlight, live (untested), blocked, and deleted ad status in red
-				$('dd.meta-status:contains(\'Live \(Untested\)\'),dd.meta-status:contains(\'Blocked\'),dd.meta-status:contains(\'Deleted \(Admin\)\')').css('padding', '1px 2px').css('background-color', '#FCB');
+				h($('dd.meta-status:contains(\'Live \(Untested\)\'),dd.meta-status:contains(\'Blocked\'),dd.meta-status:contains(\'Deleted \(Admin\)\')'));
 
-				// Make phone numbers green
-				$('dt:contains(\'Phone:\') + dd').css('padding', '1px 2px').css('background-color', '#CEB');
-						
-				// Give active, registered users a green background colour and everyone else red
-				$('dd.meta-user-status').css('padding', '1px 2px').css('background-color', '#FCB').filter('dd.meta-user-status:contains(\'Active \(User\), Registered\')').css('background-color', '#CEB');
+				// Highlight freemail domains
+				h($('dd.meta-email :first-child').filter(function() { return /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i.test( $(this).text() ); }));
 
-				// Change background colour of email address matching regex r to colour c
-				var f = function(r, c) { $('dd.meta-email :first-child').filter(function() { return r.test( $(this).text() ); }).css('padding', '1px 2px').css('background-color', c) };
+				// Highlight users with at least one bad ad (blocked or admin deleted)
+				h($('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })));
 
-				// Highlight freemail domains in red
-				f(/@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i, '#FCB');
-
-				// Highlight ISP email domains in green
-				f(/@(.+\.edu\.au|aapt\.net\.au|bigpond\.(com|net)(\.au)?|dodo\.com\.au|iinet\.net\.au|intas\.net\.au|internode\.on\.net|iprimus\.com\.au|netspace\.net\.au|optusnet\.com\.au|ozemail\.com\.au|tadaust\.org\.au|tpg\.com\.au|uplink\.net\.au|virginbroadband\.com\.au|westnet\.com\.au)$/i, '#CEB');
-
-				// Highlight users with at least one ok ad in green
-				$('dd.meta-user-history').has($('span.meta-usrads-ok').filter(function() { return $(this).text() != '0'; })).css('padding', '1px 2px').css('background-color', '#CEB');
-
-				// Highlight users with at least one bad ad in red
-				$('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })).css('padding', '1px 2px').css('background-color', '#FCB');
-
-				// Highlight users with at least one note in red
-				$('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }).css('padding', '1px 2px').css('background-color', '#FCB');
-
+				// Highlight users with at least one note
+				h($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }));
 			}
 		}
 
