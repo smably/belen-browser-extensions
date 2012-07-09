@@ -9,16 +9,12 @@
 	//   * Some long strings have been broken up onto multiple lines
 	// Original code by Sylvan Mably (sylvan@gumtree.com).
 		
-	// Make the keyword field accept 200 characters (instead of 20) and turn it green as a hint to the user
+	// If we have a srch-kwrd element, set its maxlength to 200
 	function extendKeywordField() {
 		if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
 
-			// If an element exists with id "srch-kwrd", set its max length to 200 and its background colour to green
-			var k = $('#srch-kwrd');
-			if (k) {
-				k.attr('maxlength', '200');
-				k.css('background-color', '#DFD');
-			}
+			if ($('#srch-kwrd')) $('#srch-kwrd').attr('maxlength', '200');
+
 		}
 	}
 
@@ -29,8 +25,8 @@
 			// Add links inside elements that do not already have links and return any elements to which links were added
 			var w = function(e) { return e.filter(function() { return $(this).attr('x-wrapped') != 'true'; }).attr('x-wrapped', 'true').wrapInner('<a>') };
 
-			// Remove the link cursor from the user history line
-			$('dd.meta-user-history').css('cursor', '');
+			// When mousing over the history line, make sure the link cursor is off (it gets added after this script is run, so we can't just set it here)
+			$('dd.meta-user-history').bind('mouseover', function(event) { $(this).css('cursor', 'auto') });
 
 			// TODO: Break this up onto multiple lines and document more thoroughly
 			// Wrap the text of each of the spans in the user history box in link tags
@@ -49,7 +45,6 @@
 			// Set the href and target attributes on all links according to what kind of link they are (TODO: document this more thoroughly)
 			// Add blocked class onto all links inside a blocked dd (preserves red highlighted on blocked machine IDs)
 			w($('dt:contains(\'Ad-Id:\') + dd,dt:contains(\'Machine Id:\') + dd div,dt:contains(\'Phone:\') + dd')).find('a').attr('href', function() { var t = $(this).closest('dd').prev('dt').text(); var p; if (t == 'Ad-Id:') { p = '&idAndEmailField='; } else if (t == 'Machine Id:') { p = '&machId='; } else { p = '&searchRequest.keyword='; } return '?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH' + p + $(this).text(); }).attr('target', '_blank').filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
-
 		}
 	}
 
