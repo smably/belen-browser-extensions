@@ -8,19 +8,15 @@
 	//   * I have added function names to break the code up into related pieces
 	//   * Some long strings have been broken up onto multiple lines
 	// Original code by Sylvan Mably (sylvan@gumtree.com).
+	if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
 		
-	// If we have a srch-kwrd element, set its maxlength to 200
-	function extendKeywordField() {
-		if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
-
+		// If we have a srch-kwrd element, set its maxlength to 200
+		function extendKeywordField() {
 			if ($('#srch-kwrd')) $('#srch-kwrd').attr('maxlength', '200');
-
 		}
-	}
 
-	// Add links to the ad ID, machine ID, and phone number for each ad
-	function linkify() {
-		if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
+		// Add links to the ad ID, machine ID, and phone number for each ad
+		function linkify() {
 
 			// Add links inside elements that do not already have links and return any elements to which links were added
 			var w = function(e) { return e.filter(function() { return $(this).attr('x-wrapped') != 'true'; }).attr('x-wrapped', 'true').wrapInner('<a>') };
@@ -46,11 +42,9 @@
 			// Add blocked class onto all links inside a blocked dd (preserves red highlighted on blocked machine IDs)
 			w($('dt:contains(\'Ad-Id:\') + dd,dt:contains(\'Machine Id:\') + dd div,dt:contains(\'Phone:\') + dd')).find('a').attr('href', function() { var t = $(this).closest('dd').prev('dt').text(); var p; if (t == 'Ad-Id:') { p = '&idAndEmailField='; } else if (t == 'Machine Id:') { p = '&machId='; } else { p = '&searchRequest.keyword='; } return '?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH' + p + $(this).text(); }).attr('target', '_blank').filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
 		}
-	}
 
-	// Highlight ads from first-time posters and colour-code user state
-	function hlUserRisks() {
-		if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
+		// Highlight ads from first-time posters and colour-code user state
+		function hlUserRisks() {
 
 			// Find all adRow tr elements that have a child element of class "meta-usrads-pstd" in which the text is precisely "1"
 			// To those matching tr elements, apply a blue background colour (these are our first-time posters)
@@ -74,11 +68,9 @@
 			// Highlight users with at least one note
 			h($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }));
 		}
-	}
 
-	// Open a window with the current search parameters embedded in the query string
-	function createSearchPermalink() {
-		if (location['host'] + location['pathname'] == 'cs.gumtree.com.au/searchAds.do') {
+		// Open a window with the current search parameters embedded in the query string
+		function createSearchPermalink() {
 
 			// Open a window with the Belen search URL, followed by...
 			window.open('http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&' +
