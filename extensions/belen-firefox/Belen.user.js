@@ -9,6 +9,7 @@
 // (This functions as a component of the Belen Enhancer Firefox add-on as well as a standalone Greasemonkey userscript.)
 
 function initApplication(externalJQuery) {
+
 	// Apparently we can't access jQuery directly, so we'll just use whatever is passed in... hmmm...
 	$ = externalJQuery;
 
@@ -81,12 +82,16 @@ function initApplication(externalJQuery) {
 }
 
 (function() {
+
 	// Make sure jQuery has loaded before doing the main thing
+	// Give up after 5 seconds so we don't keep looping for no reason
+	var i = 0;
 	function GM_wait() {
-		if (typeof unsafeWindow.jQuery == 'undefined')
+		if (i++ < 50 && typeof unsafeWindow.jQuery == 'undefined')
 			window.setTimeout(GM_wait, 100);
 		else
 			initApplication(unsafeWindow.jQuery);
 	}
 	GM_wait();
+
 })();
