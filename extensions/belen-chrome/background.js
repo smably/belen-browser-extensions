@@ -1,5 +1,5 @@
 // Bail out right away if we're not in Manage Ads (we don't want to slow down replies with all this crap)
-if ($('body#ads')) {
+if ($('body#ads').length > 0) {
 
 	// If we have a srch-kwrd element, set its maxlength to 200
 	function extendKeywordField() {
@@ -51,7 +51,7 @@ if ($('body#ads')) {
 		h($('dd.meta-status:contains(\'Live \(Untested\)\'),dd.meta-status:contains(\'Blocked\'),dd.meta-status:contains(\'Deleted \(Admin\)\')'));
 
 		// Highlight freemail domains
-		h($('dd.meta-email :first-child').filter(function() { return /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i.test( $(this).text() ); }));
+		h($('dd.meta-email :first-child').filter(function() { return /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|rocketmail\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i.test( $(this).text() ); }));
 
 		// Highlight users with at least one bad ad (blocked or admin deleted)
 		h($('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })));
@@ -63,4 +63,9 @@ if ($('body#ads')) {
 	extendKeywordField();
 	linkify();
 	hlUserRisks();
+
+} else {
+
+	// TODO (nothing so far)
+
 }
