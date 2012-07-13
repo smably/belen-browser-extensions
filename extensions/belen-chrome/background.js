@@ -85,13 +85,10 @@ function initApplication(externalJQuery) {
 			h($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }));
 		}
 
-		function updatePermalink() {
-		}
-
 		// Add a link button to the current page
 		function createPermalink() {
-			var permalinkCode = '<a id="permalink" target="_blank" href=""><img alt="Permalink" title="Permalink" style="border: 0; margin-bottom: -4px; margin-right: 4px;" src="data:' + LINK_ICON_DATA + '" /></a> ';
-			$('#pg-topnav a:first-child').before(permalinkCode);
+			$('#pg-topnav a:first-child').before('<a id="permalink"><img id="permalink_icon" src="data:' + LINK_ICON_DATA + '" /></a> ');
+			$('#permalink_icon').css('border', '0').css('margin-bottom', '-4px').css('margin-right', '4px').attr('alt', 'Permalink').attr('title', 'Permanant link to this search');
 
 			var permalinkURL = 'http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&';
 			permalinkURL += $('#searchForm :' +
@@ -112,6 +109,7 @@ function initApplication(externalJQuery) {
 				'[name=\'searchRequest.appealType\'][value!=\'IGNORE\']'
 			).serialize();
 			$('#permalink').attr('href', permalinkURL);
+			$('#permalink').attr('target', '_blank');
 		}
 
 		createPermalink();
