@@ -19,7 +19,7 @@ function initApplication(externalJQuery) {
 	const PATH_MANAGE_ADS = "/searchAds.do";
 	const PATH_REPLY_TS = "/replyts/screening.do";
 	const PATH_SPAM_REPORT = "/spam-report.do";
-	
+
 	const LINK_ICON_DATA = "image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADpSURBVCjPY/jPgB8y0EmBHXdWaeu7ef9rHuaY50jU3J33v/VdVqkdN1SBEZtP18T/L/7f/X/wf+O96kM3f9z9f+T/xP8+XUZsYAWGfsUfrr6L2Ob9J/X/pP+V/1P/e/+J2LbiYfEHQz+ICV1N3yen+3PZf977/9z/Q//X/rf/7M81Ob3pu1EXWIFuZvr7aSVBOx1/uf0PBEK3/46/gnZOK0l/r5sJVqCp6Xu99/2qt+v+T/9f+L8CSK77v+pt73vf65qaYAVqzPYGXvdTvmR/z/4ZHhfunP0p+3vKF6/79gZqzPQLSYoUAABKPQ+kpVV/igAAAABJRU5ErkJggg==";
 
 
@@ -87,11 +87,7 @@ function initApplication(externalJQuery) {
 
 		// Add a link button to the current page
 		function createPermalink() {
-			$('#pg-topnav a:first-child').before('<a id="permalink"><img id="permalink_icon" src="data:' + LINK_ICON_DATA + '" /></a> ');
-			$('#permalink_icon').css('border', '0').css('margin-bottom', '-4px').css('margin-right', '4px').attr('alt', 'Permalink').attr('title', 'Permanant link to this search');
-
-			var permalinkURL = 'http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&';
-			permalinkURL += $('#searchForm :' +
+			var searchParams = $('#searchForm :' +
 				'[name=\'categoryId1stLevel\'],' + 
 				'[name=\'categoryId2ndLevel\'][value!=\'\'],' +
 				'[name=\'searchRequest.scoreGroups\'],' +
@@ -108,8 +104,14 @@ function initApplication(externalJQuery) {
 				'[name=\'searchRequest.flagType\'][value!=\'\'],' +
 				'[name=\'searchRequest.appealType\'][value!=\'IGNORE\']'
 			).serialize();
-			$('#permalink').attr('href', permalinkURL);
-			$('#permalink').attr('target', '_blank');
+
+			if (searchParams.length > 0) {
+				$('#pg-topnav a:first-child').before('<a id="permalink"><img id="permalink_icon" src="data:' + LINK_ICON_DATA + '" /></a> ');
+				$('#permalink_icon').css('border', '0').css('margin-bottom', '-4px').css('margin-right', '4px').attr('alt', 'Permalink').attr('title', 'Permanant link to this search');
+
+				$('#permalink').attr('href', PATH_MANAGE_ADS + '?formAction=submitSearch&' + searchParams);
+				$('#permalink').attr('target', '_blank');
+			}
 		}
 
 		createPermalink();
@@ -121,26 +123,44 @@ function initApplication(externalJQuery) {
 	// Do the stuff in ReplyTS
 	else if (location.pathname == PATH_REPLY_TS) {
 
+		// Set the "ad ID" link to show all replies from that ad, not just the ones from the past day
+		function fixIdLinks() {
+
+			$('#rts-tbl td:first-child p:nth-child(2) a:first-child').attr('href', function() { return $(this).attr('href') + "&daterange=NO_RANGE"; });
+		}
+
 		// Add links to message IDs (note that they will only work with this extension installed)
 		function linkifyReplies() {
-			$('#rts-tbl td:first-child p:nth-child(2)').contents().filter(function() { return $(this).text().trim().match(/^Message ID: \d+$/); }).replaceWith(function() { var m = $(this).text().match(/\d+/)[0]; return 'Message ID: <a href=\'?srch-jumptomessage-id=' + m + '\' target=\'_blank\'>' + m + '</a>'; })
+
+			$('#rts-tbl td:first-child p:nth-child(2)').contents().filter(function() { return $(this).text().trim().match(/^Message ID: \d+$/); }).replaceWith(function() { var m = $(this).text().match(/\d+/)[0]; return 'Message ID: <a href=\'?srch-jumptomessage-id=' + m + '\' target=\'_blank\'>' + m + '</a>'; });
 		}
 
 		// Highlight the bad stuff in replies
 		function hlReplyRisks() {
+
 			// Function to highlight an element in red (accepts a jQuery object returns nothing)
 			var h = function(e) { e.css('padding', '1px 2px').css('background-color', '#FCB') };
 
 			h($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
 		}
 
-		$('#replyts-screening-results').bind('DOMNodeInserted', function(event) {
-			linkifyReplies();
-			hlReplyRisks();
-		});
+		// Fix all the things in replies
+		function initReplies() {
 
-		linkifyReplies();
-		hlReplyRisks();
+			// If the results table is not flagged as fixed, immediately set the flag to fixed and then fix all the replies
+			// Conveniently, every time a new search is performed, we get a new results table (with the flag not set, of course)
+			if ($('#rts-tbl').length > 0 && $('#rts-tbl').attr('x-fixed') != 'true') {
+				$('#rts-tbl').attr('x-fixed', 'true');
+
+				fixIdLinks();
+				linkifyReplies();
+				hlReplyRisks();
+			}
+		}
+
+		// Watch for elements being added to the reply screening container
+		$('#replyts-screening-results').bind('DOMNodeInserted', initReplies);
+		initReplies();
 	}
 
 	// Do the stuff in the spam reports
