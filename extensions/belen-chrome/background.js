@@ -19,6 +19,8 @@ function initApplication(externalJQuery) {
 	const PATH_MANAGE_ADS = "/searchAds.do";
 	const PATH_REPLY_TS = "/replyts/screening.do";
 	const PATH_SPAM_REPORT = "/spam-report.do";
+	
+	const LINK_ICON_DATA = "image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADpSURBVCjPY/jPgB8y0EmBHXdWaeu7ef9rHuaY50jU3J33v/VdVqkdN1SBEZtP18T/L/7f/X/wf+O96kM3f9z9f+T/xP8+XUZsYAWGfsUfrr6L2Ob9J/X/pP+V/1P/e/+J2LbiYfEHQz+ICV1N3yen+3PZf977/9z/Q//X/rf/7M81Ob3pu1EXWIFuZvr7aSVBOx1/uf0PBEK3/46/gnZOK0l/r5sJVqCp6Xu99/2qt+v+T/9f+L8CSK77v+pt73vf65qaYAVqzPYGXvdTvmR/z/4ZHhfunP0p+3vKF6/79gZqzPQLSYoUAABKPQ+kpVV/igAAAABJRU5ErkJggg==";
 
 
 	if (location.pathname == PATH_MANAGE_ADS) {
@@ -83,6 +85,36 @@ function initApplication(externalJQuery) {
 			h($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }));
 		}
 
+		function updatePermalink() {
+		}
+
+		// Add a link button to the current page
+		function createPermalink() {
+			var permalinkCode = '<a id="permalink" target="_blank" href=""><img alt="Permalink" title="Permalink" style="border: 0; margin-bottom: -4px; margin-right: 4px;" src="data:' + LINK_ICON_DATA + '" /></a> ';
+			$('#pg-topnav a:first-child').before(permalinkCode);
+
+			var permalinkURL = 'http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&';
+			permalinkURL += $('#searchForm :' +
+				'[name=\'categoryId1stLevel\'],' + 
+				'[name=\'categoryId2ndLevel\'][value!=\'\'],' +
+				'[name=\'searchRequest.scoreGroups\'],' +
+				'[name=\'searchRequest.activeFeatureTypes\'],' +
+				'[name=\'purchaseOrderId\'][value!=\'\'],' +
+				'[name=\'searchRequest.groupedAdState\'],' +
+				'[name=\'searchRequest.dateRangeType\'][value!=\'LAST_WEEK\'],' +
+				'[name=\'idAndEmailField\'][value!=\'\'],' +
+				'[name=\'machId\'][value!=\'\'],' +
+				'[name=\'paymentTransactionId\'][value!=\'\'],' +
+				'[name=\'searchRequest.ip\'][value!=\'\'],' +
+				'[name=\'searchRequest.keyword\'][value!=\'\'],' +
+				'[name=\'searchRequest.agent\'][value!=\'\'],' +
+				'[name=\'searchRequest.flagType\'][value!=\'\'],' +
+				'[name=\'searchRequest.appealType\'][value!=\'IGNORE\']'
+			).serialize();
+			$('#permalink').attr('href', permalinkURL);
+		}
+
+		createPermalink();
 		extendKeywordField();
 		linkifyAds();
 		hlAdRisks();
