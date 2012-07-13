@@ -1,5 +1,6 @@
 #### Belen Bookmarklets, by Sylvan Mably
-This is a collection of bookmarklets that make Belen more usable.
+Once upon a time, these were bookmarklets.
 
-There is some documentation in the main file, index.html. Mostly, these are
-self-explanatory. Just drag up to the bookmarks bar to install.
+Now, they are browser extensions. The Chrome extension is self-contained. The
+Firefox extension can be downloaded from here:
+	https://builder.addons.mozilla.org/addon/1064976/
