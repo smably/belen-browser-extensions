@@ -146,6 +146,10 @@ function initApplication(externalJQuery) {
 	// Do the stuff in the spam reports
 	else if (location.pathname == PATH_SPAM_REPORT) {
 
+		// Wrap message IDs and ad IDs in links
+		$('tr.record td:nth-child(3)').wrapInner(function() { return "<a href='" + PATH_REPLY_TS + "?srch-jumptomessage-id=" + $(this).text() + "' target='_blank'>"; });
+		$('tr.record td:nth-child(4)').wrapInner(function() { return "<a href='" + PATH_MANAGE_ADS + "?formAction=submitSearch&idAndEmailField=" + $(this).text() + "' target='_blank'>"; });
+		$('tr.record td:nth-child(7)').wrapInner(function() { return "<a href='" + PATH_REPLY_TS + "?ip=" + $(this).text() + "&daterange=LAST_DAY' target='_blank'>"; });
 	}
 }
 
