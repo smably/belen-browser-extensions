@@ -3,7 +3,12 @@
   "version": "1.6.0.0",
   "description": "Fixes various annoyances in Belen.",
   "content_scripts": [ {
-    "js": [ "jquery-1.7.2.min.js", "replyts_jumptomessage.js" ],
+    "js": [ "jquery-1.7.2.min.js" ],
+    "matches": [ "http://cs.gumtree.com.au/*"],
+    "run_at": "document_start"
+  },
+  {
+    "js": [ "replyts_jumptomessage.js" ],
     "matches": [ "http://cs.gumtree.com.au/replyts/screening.do*"],
     "run_at": "document_start"
   },
