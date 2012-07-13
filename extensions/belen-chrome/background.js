@@ -13,7 +13,15 @@ function initApplication(externalJQuery) {
 	// We may not be able to access jQuery directly, so we'll just use whatever is passed in... hmmm...
 	$ = externalJQuery;
 
-	if (location.pathname == "/searchAds.do") {
+	// Constants!
+	const FREEMAIL_REGEX = /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|rocketmail\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i;
+
+	const PATH_MANAGE_ADS = "/searchAds.do";
+	const PATH_REPLY_TS = "/replyts/screening.do";
+	const PATH_SPAM_REPORT = "/spam-report.do";
+
+
+	if (location.pathname == PATH_MANAGE_ADS) {
 		// Do the stuff in Manage Ads..
 
 		// If we have a srch-kwrd element, set its maxlength to 200
@@ -66,7 +74,7 @@ function initApplication(externalJQuery) {
 			h($('dd.meta-status:contains(\'Live \(Untested\)\'),dd.meta-status:contains(\'Blocked\'),dd.meta-status:contains(\'Deleted \(Admin\)\')'));
 
 			// Highlight freemail domains
-			h($('dd.meta-email :first-child').filter(function() { return /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|rocketmail\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i.test( $(this).text() ); }));
+			h($('dd.meta-email :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
 
 			// Highlight users with at least one bad ad (blocked or admin deleted)
 			h($('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })));
@@ -81,7 +89,7 @@ function initApplication(externalJQuery) {
 	}
 
 	// Do the stuff in ReplyTS
-	else if (location.pathname == "/replyts/screening.do") {
+	else if (location.pathname == PATH_REPLY_TS) {
 
 		// Add links to message IDs (note that they will only work with this extension installed)
 		function linkifyReplies() {
@@ -93,7 +101,7 @@ function initApplication(externalJQuery) {
 			// Function to highlight an element in red (accepts a jQuery object returns nothing)
 			var h = function(e) { e.css('padding', '1px 2px').css('background-color', '#FCB') };
 
-			h($('span.j-block-status :first-child').filter(function() { return /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|rocketmail\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i.test( $(this).text() ); }));
+			h($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
 		}
 
 		$('#replyts-screening-results').bind('DOMNodeInserted', function(event) {
@@ -106,7 +114,7 @@ function initApplication(externalJQuery) {
 	}
 
 	// Do the stuff in the spam reports
-	else if (location.pathname == "/spam-report.do") {
+	else if (location.pathname == PATH_SPAM_REPORT) {
 
 	}
 }
@@ -139,4 +147,3 @@ function initApplication(externalJQuery) {
 	}
 
 })();
-
