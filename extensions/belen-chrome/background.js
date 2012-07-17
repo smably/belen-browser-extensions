@@ -20,6 +20,9 @@ function initApplication(externalJQuery) {
 	const PATH_REPLY_TS = "/replyts/screening.do";
 	const PATH_SPAM_REPORT = "/spam-report.do";
 
+	const COLOUR_GREEN_HIGHLIGHT = "#BEA";
+	const COLOUR_RED_HIGHLIGHT = "#FCB";
+
 	const LINK_ICON_DATA = "image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADpSURBVCjPY/jPgB8y0EmBHXdWaeu7ef9rHuaY50jU3J33v/VdVqkdN1SBEZtP18T/L/7f/X/wf+O96kM3f9z9f+T/xP8+XUZsYAWGfsUfrr6L2Ob9J/X/pP+V/1P/e/+J2LbiYfEHQz+ICV1N3yen+3PZf977/9z/Q//X/rf/7M81Ob3pu1EXWIFuZvr7aSVBOx1/uf0PBEK3/46/gnZOK0l/r5sJVqCp6Xu99/2qt+v+T/9f+L8CSK77v+pt73vf65qaYAVqzPYGXvdTvmR/z/4ZHhfunP0p+3vKF6/79gZqzPQLSYoUAABKPQ+kpVV/igAAAABJRU5ErkJggg==";
 
 
@@ -67,7 +70,7 @@ function initApplication(externalJQuery) {
 			$('tr.adRow').has($('span.meta-usrads-pstd').filter(function() { return $(this).text() == '1'; })).css('background-color', '#E3EDFA');
 
 			// Function to highlight an element in red (accepts a jQuery object returns nothing)
-			var h = function(e) { e.css('padding', '1px 2px').css('background-color', '#FCB') };
+			var h = function(e) { e.css('padding', '1px 2px').css('background-color', COLOUR_RED_HIGHLIGHT) };
 
 			// Highlight all scores >0
 			h($('dd.meta-scr').filter(function() { return $(this).text().trim() != '0'; }));
@@ -91,21 +94,35 @@ function initApplication(externalJQuery) {
 			// If there's a search keyword field and it has terms in it, highlight them in ads
 			if ($('#srch-kwrd').length > 0 && $('#srch-kwrd').val() != "") {
 
-				// Extract quoted strings from  search keywords
+				// Extract words and quoted strings from search keywords
 				var keywords = $('#srch-kwrd').val().match(/".+?"|\w+/g);
-				console.log(keywords);
 
+				// Helper function to highlight all occurrences of string str in jQuery element el
+				var hl = function(el, str) {
+
+					// Escape special regex characters!
+					str = str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+
+					var regex = new RegExp(str, 'gi');
+					var highlight = "<span style='background-color: " + COLOUR_GREEN_HIGHLIGHT + "; font-weight: bold;'>$&</span>";
+
+					el.replaceWith(function() { return $(this).text().replace(regex, highlight); });
+				};
+
+				// Highlight each each search keyword (or "quote delimited" phrase)
 				$.each(keywords, function(i, keyword) {
-					// Strip quotes from quoted strings
-					keyword = keyword.toString().replace(/"/g, '');
-					console.log(keyword);
 
-					// Add highlighting for the term
-					$('h2.p-ads-hdln-title,p.meta-description').highlight(keyword);
+					// The text eligible for highlighting is  all text nodes within the ad title and descrption elements
+					var titleAndDescriptionText = $('h2.p-ads-hdln-title,p.meta-description').contents().filter(function() { return this.nodeType == 3; });
+
+					// If there are any elements that can be highlighted, highlight them with the keyword (stripping it of quotation marks if necessary)
+					if (titleAndDescriptionText.length > 0) {
+						hl(titleAndDescriptionText, keyword.toString().replace(/"/g, ''));
+					}
 				});
 
 				// Set some highlighting on the search terms
-				$('span.highlight').css('background-color', '#CEB').css('font-weight', 'bold');
+				$('span.highlight').css('background-color', COLOUR_GREEN_HIGHLIGHT).css('font-weight', 'bold');
 			}
 		}
 
@@ -164,7 +181,7 @@ function initApplication(externalJQuery) {
 		function hlReplyRisks() {
 
 			// Function to highlight an element in red (accepts a jQuery object returns nothing)
-			var h = function(e) { e.css('padding', '1px 2px').css('background-color', '#FCB') };
+			var h = function(e) { e.css('padding', '1px 2px').css('background-color', COLOUR_RED_HIGHLIGHT) };
 
 			h($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
 		}

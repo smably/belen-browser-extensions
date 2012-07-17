@@ -1,6 +1,6 @@
 {
   "name": "Belen Enhancer for Chrome",
-  "version": "1.6.0.0",
+  "version": "1.6.0.1",
   "description": "Fixes various annoyances in Belen.",
   "content_scripts": [ {
     "js": [ "jquery-1.7.2.min.js" ],
@@ -13,7 +13,7 @@
     "run_at": "document_start"
   },
   {
-    "js": [ "jquery.highlight-3.yui.js", "background.js" ],
+    "js": [ "background.js" ],
     "matches": [ "http://cs.gumtree.com.au/*"],
     "run_at": "document_idle"
   }]
