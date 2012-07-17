@@ -85,6 +85,30 @@ function initApplication(externalJQuery) {
 			h($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }));
 		}
 
+		// Highlight keyword search terms
+		function hlSearchTerms() {
+
+			// If there's a search keyword field and it has terms in it, highlight them in ads
+			if ($('#srch-kwrd').length > 0 && $('#srch-kwrd').val() != "") {
+
+				// Extract quoted strings from  search keywords
+				var keywords = $('#srch-kwrd').val().match(/".+?"|\w+/g);
+				console.log(keywords);
+
+				$.each(keywords, function(i, keyword) {
+					// Strip quotes from quoted strings
+					keyword = keyword.toString().replace(/"/g, '');
+					console.log(keyword);
+
+					// Add highlighting for the term
+					$('h2.p-ads-hdln-title,p.meta-description').highlight(keyword);
+				});
+
+				// Set some highlighting on the search terms
+				$('span.highlight').css('background-color', '#CEB').css('font-weight', 'bold');
+			}
+		}
+
 		// Add a link button to the current page
 		function createPermalink() {
 			var searchParams = $('#searchForm :' +
@@ -118,6 +142,7 @@ function initApplication(externalJQuery) {
 		extendKeywordField();
 		linkifyAds();
 		hlAdRisks();
+		hlSearchTerms();
 	}
 
 	// Do the stuff in ReplyTS
@@ -144,6 +169,26 @@ function initApplication(externalJQuery) {
 			h($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
 		}
 
+		// Hide Gumtree boilerplate in replies
+		function hideBoilerplate() {
+
+			// Text at the bottom varies depending on whether or not the user is registered
+			var boilerplateStartRegex = new RegExp('(.|\n)+?Message:');
+			var boilerplateEndRegex = new RegExp('<br>(Please report any suspicious email|If your ad is no longer available)(.|\n)+');
+
+			var repliesWithBoilerplate = $('div.rts-mail-body').filter(function() { return ($(this).text().trim().indexOf('Someone has replied to your ad!') == 0); });
+
+			// Make a little function to replace a bunch of text with an inconspicuous ellipsis
+			var r = function(el, regex) {
+				el.innerHTML = el.innerHTML.replace(regex, function(matched) {return "<span style='color: #AAA;'>[ ... ]</span>";});
+			}
+
+			repliesWithBoilerplate.each(function() {
+				r(this, boilerplateStartRegex);
+				r(this, boilerplateEndRegex);
+			});
+		}
+
 		// Fix all the things in replies
 		function initReplies() {
 
@@ -155,6 +200,7 @@ function initApplication(externalJQuery) {
 				fixIdLinks();
 				linkifyReplies();
 				hlReplyRisks();
+				hideBoilerplate();
 			}
 		}
 
