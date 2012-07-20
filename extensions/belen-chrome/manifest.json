@@ -13,6 +13,11 @@
     "run_at": "document_start"
   },
   {
+    "js": [ "category_list.js" ],
+    "matches": [ "http://cs.gumtree.com.au/searchAds.do*"],
+    "run_at": "document_start"
+  },
+  {
     "js": [ "background.js" ],
     "matches": [ "http://cs.gumtree.com.au/*"],
     "run_at": "document_idle"
