@@ -86,7 +86,7 @@ function initApplication(externalJQuery) {
 			});
 
 			// Add blocked class onto all links inside a blocked dd (preserves red highlighted on blocked machine IDs)
-			attributeLinks.attr('target', '_blank').filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
+			adAttributeLinks.attr('target', '_blank').filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
 		}
 
 		// Highlight ads from first-time posters and colour-code user state
