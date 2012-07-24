@@ -36,10 +36,8 @@ function initApplication(externalJQuery) {
 	if (location.pathname == PATH_MANAGE_ADS) {
 		// Do the stuff in Manage Ads..
 
-		// If we have a srch-kwrd element, set its maxlength to 200
-		function extendKeywordField() {
-			if ($('#srch-kwrd')) $('#srch-kwrd').attr('maxlength', '200');
-		}
+		// Remove the maxLength attribute from the search keyword box
+		function extendKeywordField() { $('#srch-kwrd').removeAttr('maxlength'); }
 
 		// Add links to the ad ID, machine ID, and phone number for each ad
 		function linkifyAds() {
@@ -50,23 +48,45 @@ function initApplication(externalJQuery) {
 			// When mousing over the history line, make sure the link cursor is off (it gets added after this script is run, so we can't just set it here)
 			$('dd.meta-user-history').bind('mouseover', function(event) { $(this).css('cursor', 'auto') });
 
-			// TODO: Break this up onto multiple lines and document more thoroughly
 			// Wrap the text of each of the spans in the user history box in link tags
-			// Apply the span class to child link tags to preserve link colour
+			var userHistoryLinks = w($('span.meta-usrads-pstd,span.meta-usrads-ok,span.meta-usrads-bad')).find('a');
+
+			// Apply the span class to child link tags to preserve link colour and add target "_blank" to force links to open in a new window
+			userHistoryLinks.addClass(function() { return $(this).parent().attr('class'); }).attr('target', '_blank');
+
 			// Add the link href attributes according to the class of the element and the text in the email field
-			// Add target "_blank" to force links to open in a new window
-			w($('span.meta-usrads-pstd,span.meta-usrads-ok,span.meta-usrads-bad')).find('a').addClass(function() { return $(this).parent().attr('class'); }).attr('href', function() { var p = ''; if ($(this).hasClass('meta-usrads-bad')) { p = '&searchRequest.groupedAdState=BLOCKED&searchRequest.groupedAdState=BLOCK_ADMIN_CONFIRMED&searchRequest.groupedAdState=DELETED__ADMIN_DELETED'; } else if ($(this).hasClass('meta-usrads-ok')) { p = '&searchRequest.groupedAdState=DELAYED&searchRequest.groupedAdState=ACTIVE__TNS_SCORE_FILTER&searchRequest.groupedAdState=ACTIVE__ADMIN_REVIEWED&searchRequest.groupedAdState=ACTIVE__DELAYED_TIMEOUT'; } return '?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE' + p + '&idAndEmailField=' + $(this).closest('dl.p-ads-dl').find('dd.meta-email :first-child').text(); }).attr('target', '_blank');
+			userHistoryLinks.attr('href', function() {
+				var p = '';
+				if ($(this).hasClass('meta-usrads-bad'))
+					p = '&searchRequest.groupedAdState=BLOCKED&searchRequest.groupedAdState=BLOCK_ADMIN_CONFIRMED&searchRequest.groupedAdState=DELETED__ADMIN_DELETED';
+				else if ($(this).hasClass('meta-usrads-ok'))
+					p = '&searchRequest.groupedAdState=DELAYED&searchRequest.groupedAdState=ACTIVE__TNS_SCORE_FILTER&searchRequest.groupedAdState=ACTIVE__ADMIN_REVIEWED&searchRequest.groupedAdState=ACTIVE__DELAYED_TIMEOUT';
+				return '?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE' + p + '&idAndEmailField=' + $(this).closest('dl.p-ads-dl').find('dd.meta-email :first-child').text();
+			});
 
 			// Add some informative titles on the new links
 			$('a.meta-usrads-pstd').attr('title', 'View all ads from this user');
 			$('a.meta-usrads-ok').attr('title', 'View live and delayed ads from this user');
 			$('a.meta-usrads-bad').attr('title', 'View blocked and admin deleted ads from this user');
 
-			// TODO: Break this up onto multiple lines and document more thoroughly
 			// Find the parent elements of the ad ID, machine ID, and phone number, wrap their contents in link tags
-			// Set the href and target attributes on all links according to what kind of link they are (TODO: document this more thoroughly)
+			var adAttributeLinks = w($('dt:contains(\'Ad-Id:\') + dd,dt:contains(\'Machine Id:\') + dd div,dt:contains(\'Phone:\') + dd')).find('a')
+
+			// Set the href and target attributes on all links according to what kind of link they are
+			adAttributeLinks.attr('href', function() {
+				var t = $(this).closest('dd').prev('dt').text();
+				var p;
+				if (t == 'Ad-Id:')
+					p = '&idAndEmailField=';
+				else if (t == 'Machine Id:')
+					p = '&machId=';
+				else
+					p = '&searchRequest.keyword=';
+				return '?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH' + p + $(this).text();
+			});
+
 			// Add blocked class onto all links inside a blocked dd (preserves red highlighted on blocked machine IDs)
-			w($('dt:contains(\'Ad-Id:\') + dd,dt:contains(\'Machine Id:\') + dd div,dt:contains(\'Phone:\') + dd')).find('a').attr('href', function() { var t = $(this).closest('dd').prev('dt').text(); var p; if (t == 'Ad-Id:') { p = '&idAndEmailField='; } else if (t == 'Machine Id:') { p = '&machId='; } else { p = '&searchRequest.keyword='; } return '?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH' + p + $(this).text(); }).attr('target', '_blank').filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
+			attributeLinks.attr('target', '_blank').filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
 		}
 
 		// Highlight ads from first-time posters and colour-code user state
