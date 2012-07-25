@@ -36,7 +36,7 @@ function initApplication(externalJQuery) {
 		"/1P/e/+J2LbiYfEHQz+ICV1N3yen+3PZf977/9z/Q//X/rf/7M81Ob3pu1EXWIFuZvr7aSVBOx1/uf0P" + 
 		"BEK3/46/gnZOK0l/r5sJVqCp6Xu99/2qt+v+T/9f+L8CSK77v+pt73vf65qaYAVqzPYGXvdTvmR/z/4Z" +
 		"HhfunP0p+3vKF6/79gZqzPQLSYoUAABKPQ+kpVV/igAAAABJRU5ErkJggg==";
-	const EMAIL_ICON_SRC = "data:image/png;base64," +
+	const MAIL_ICON_SRC = "data:image/png;base64," +
 		"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m" +
 		"dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAITSURBVBgZpcHLThNhGIDh9/vn7/RApwc5VCmFWBPi" +
 		"1mvwAlx7BW69Afeu3bozcSE7E02ILjCRhRrds8AEbKVS2gIdSjvTmf+TYqLu+zyiqszDMCf75PnnnVwh" +
@@ -58,19 +58,29 @@ function initApplication(externalJQuery) {
 		// Add links to the ad ID, machine ID, and phone number for each ad
 		function linkifyAds() {
 
-			// Add links inside elements that do not already have links and return any elements to which links were added
-			var w = function(e) { return e.filter(function() {
-				return $(this).attr('x-wrapped') != 'true'; }).attr('x-wrapped', 'true').wrapInner('<a>');
+			// Add links inside elements that do not already have links and return the link added
+			var linkWrap = function(e) {
+
+				// Find any elements that have not yet been wrapped
+				var unwrapped = $(e).filter(function() {
+					return $(this).attr('x-wrapped') != 'true';
+				});
+
+				// Mark them as wrapped
+				unwrapped.attr('x-wrapped', 'true');
+
+				// Wrap them in link tags and return the link tag added
+				return unwrapped.wrapInner($('<a></a>').attr('target', '_blank')).find('a');
 			};
 
 			// When mousing over the history line, make sure the link cursor is off (it gets added after this script is run, so we can't just set it here)
 			$('dd.meta-user-history').bind('mouseover', function(event) { $(this).css('cursor', 'auto') });
 
 			// Wrap the text of each of the spans in the user history box in link tags
-			var userHistoryLinks = w($('span.meta-usrads-pstd,span.meta-usrads-ok,span.meta-usrads-bad')).find('a');
+			var userHistoryLinks = linkWrap($('span.meta-usrads-pstd,span.meta-usrads-ok,span.meta-usrads-bad'));
 
-			// Apply the span class to child link tags to preserve link colour and add target "_blank" to force links to open in a new window
-			userHistoryLinks.addClass(function() { return $(this).parent().attr('class'); }).attr('target', '_blank');
+			// Apply the span class to child link tags to preserve link colour
+			userHistoryLinks.addClass(function() { return $(this).parent().attr('class'); });
 
 			// Add the link href attributes according to the class of the element and the text in the email field
 			userHistoryLinks.attr('href', function() {
@@ -88,20 +98,35 @@ function initApplication(externalJQuery) {
 			$('a.meta-usrads-bad').attr('title', 'View blocked and admin deleted ads from this user');
 
 			// Find the parent elements of the ad ID, machine ID, and phone number, wrap their contents in link tags
-			var adIDLinks = w($('dt:contains("Ad-Id:")').next('dd')).find('a');
-			var machineIDLinks = w($('dt:contains("Machine Id:")').next('dd').find('div')).find('a');
-			var phoneLinks = w($('dt:contains("Phone:")').next('dd')).find('a');
+			var adIDLinks = linkWrap($('dt:contains("Ad-Id:")').next('dd'));
+			var machineIDLinks = linkWrap($('dt:contains("Machine Id:")').next('dd').find('div'));
+			var phoneLinks = linkWrap($('dt:contains("Phone:")').next('dd'));
 
+			// Restore red highlighting on blocked machine IDs
+			machineIDLinks.filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
+
+			// Return link based on the text of the element we are linking
 			var generateLinkHref = function(el, queryString) {
 				return '?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH' + queryString + $(el).text();
 			}
 
+			// Set link hrefs for all the links we have added
 			adIDLinks.each(function() { $(this).attr('href', generateLinkHref(this, '&idAndEmailField=')); });
 			machineIDLinks.each(function() { $(this).attr('href', generateLinkHref(this, '&machId=')); });
 			phoneLinks.each(function() { $(this).attr('href', generateLinkHref(this, '&searchRequest.keyword=')); });
 
-			// Add blocked class onto all links inside a blocked dd (preserves red highlighted on blocked machine IDs)
-			adIDLinks.add(machineIDLinks).add(phoneLinks).attr('target', '_blank').filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
+			// Create mail icon from a data: URI and set attributes
+			var mailIcon = $('<img>').attr('src', MAIL_ICON_SRC);
+			mailIcon.attr('alt', 'Replies to this ad').attr('title', 'Replies to this ad');
+			mailIcon.css('vertical-align', 'middle').css('margin', '-2px 8px 0 8px').css('border', 'none');
+
+			// Wrap the mail icon in a link and add it after each ad ID
+			adIDLinks.each(function() {
+				var repliesURL = '/replyts/screening.do?idmail=' + $(this).text() + '&daterange=NO_RANGE';
+				var mailLink = $('<a></a>').attr('href', repliesURL).attr('target', '_blank');
+
+				$(this).after(mailIcon.clone().wrap(mailLink).parent());
+			});
 		}
 
 		// Highlight ads from first-time posters and colour-code user state
