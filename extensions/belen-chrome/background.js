@@ -374,13 +374,13 @@ var initApplication = function(externalJQuery) {
 		};
 
 		// Highlight the bad stuff in replies
-		var hlReplyRisks() = function() {
+		var hlReplyRisks = function() {
 
 			hlRed($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
 		};
 
 		// Hide Gumtree boilerplate in replies
-		var hideBoilerplate() = function() {
+		var hideBoilerplate = function() {
 
 			// Text at the bottom varies depending on whether or not the user is registered
 			var boilerplateStartRegex = new RegExp('(.|\n)+?Message:');
