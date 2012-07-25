@@ -48,6 +48,12 @@ function initApplication(externalJQuery) {
 		"84wmMZ1eyFI1QBVQwV5GiaZOpdsPaSwH5HMZULi9UmB9pYAAouBQbMHHrgQcnQwZV/KgTu1o8PMgipON" +
 		"u2t5KeaNiEkxgAiICDMCCFeEK5aNauAOfoXx8KR9ZOOLk8P7j7er2WBhwWY9sdbDeIJnwBjBWBBAhGsC" +
 		"miZxPD4/7Z98b/0QVWUehjkZ5vQb/Un5e/DIsVsAAAAASUVORK5CYII=";
+		
+	// Function to highlight a set of elements in red (accepts an element or jQuery object, returns nothing)
+	const hlRed = function(e) {
+		$(e).css('padding', '1px 2px').css('background-color', COLOUR_RED_HIGHLIGHT)
+	};
+
 
 	if (location.pathname == PATH_MANAGE_ADS) {
 		// Do the stuff in Manage Ads..
@@ -84,12 +90,17 @@ function initApplication(externalJQuery) {
 
 			// Add the link href attributes according to the class of the element and the text in the email field
 			userHistoryLinks.attr('href', function() {
-				var p = '';
+
+				// Find the email address of the user associated with the ad and save it
+				var userEmail = $(this).closest('dl.p-ads-dl').find('dd.meta-email :first-child').text();
+				var params = '';
+
+				// Set the params if necessary (only for OK/bad ads -- not necessary when we want all ads) and return the complete URL
 				if ($(this).hasClass('meta-usrads-bad'))
-					p = '&searchRequest.groupedAdState=BLOCKED&searchRequest.groupedAdState=BLOCK_ADMIN_CONFIRMED&searchRequest.groupedAdState=DELETED__ADMIN_DELETED';
+					params = '&searchRequest.groupedAdState=BLOCKED&searchRequest.groupedAdState=BLOCK_ADMIN_CONFIRMED&searchRequest.groupedAdState=DELETED__ADMIN_DELETED';
 				else if ($(this).hasClass('meta-usrads-ok'))
-					p = '&searchRequest.groupedAdState=DELAYED&searchRequest.groupedAdState=ACTIVE__TNS_SCORE_FILTER&searchRequest.groupedAdState=ACTIVE__ADMIN_REVIEWED&searchRequest.groupedAdState=ACTIVE__DELAYED_TIMEOUT';
-				return '?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE' + p + '&idAndEmailField=' + $(this).closest('dl.p-ads-dl').find('dd.meta-email :first-child').text();
+					params = '&searchRequest.groupedAdState=DELAYED&searchRequest.groupedAdState=ACTIVE__TNS_SCORE_FILTER&searchRequest.groupedAdState=ACTIVE__ADMIN_REVIEWED&searchRequest.groupedAdState=ACTIVE__DELAYED_TIMEOUT';
+				return '?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE' + params + '&idAndEmailField=' + userEmail;
 			});
 
 			// Add some informative titles on the new links
@@ -136,23 +147,20 @@ function initApplication(externalJQuery) {
 			// To those matching tr elements, apply a blue background colour (these are our first-time posters)
 			$('tr.adRow').has($('span.meta-usrads-pstd').filter(function() { return $(this).text() == '1'; })).css('background-color', COLOUR_BLUE_BACKGROUND);
 
-			// Function to highlight an element in red (accepts a jQuery object returns nothing)
-			var h = function(e) { e.css('padding', '1px 2px').css('background-color', COLOUR_RED_HIGHLIGHT) };
-
 			// Highlight all scores >0
-			h($('dd.meta-scr').filter(function() { return $(this).text().trim() != '0'; }));
+			hlRed($('dd.meta-scr').filter(function() { return $(this).text().trim() != '0'; }));
 
 			// Highlight, live (untested), blocked, and deleted ad status in red
-			h($('dd.meta-status:contains(\'Live \(Untested\)\'),dd.meta-status:contains(\'Blocked\'),dd.meta-status:contains(\'Deleted \(Admin\)\')'));
+			hlRed($('dd.meta-status:contains("Live \(Untested\)"),dd.meta-status:contains("Blocked"),dd.meta-status:contains("Deleted \(Admin\)")'));
 
 			// Highlight freemail domains
-			h($('dd.meta-email :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
+			hlRed($('dd.meta-email :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
 
 			// Highlight users with at least one bad ad (blocked or admin deleted)
-			h($('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })));
+			hlRed($('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })));
 
 			// Highlight users with at least one note
-			h($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }));
+			hlRed($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }));
 		}
 
 		// Highlight keyword search terms
@@ -196,21 +204,21 @@ function initApplication(externalJQuery) {
 		// Add a link button to the current page
 		function createPermalink() {
 			var searchParams = $('#searchForm :' +
-				'[name=\'categoryId1stLevel\'],' + 
-				'[name=\'categoryId2ndLevel\'][value!=\'\'],' +
-				'[name=\'searchRequest.scoreGroups\'],' +
-				'[name=\'searchRequest.activeFeatureTypes\'],' +
-				'[name=\'purchaseOrderId\'][value!=\'\'],' +
-				'[name=\'searchRequest.groupedAdState\'],' +
-				'[name=\'searchRequest.dateRangeType\'][value!=\'LAST_WEEK\'],' +
-				'[name=\'idAndEmailField\'][value!=\'\'],' +
-				'[name=\'machId\'][value!=\'\'],' +
-				'[name=\'paymentTransactionId\'][value!=\'\'],' +
-				'[name=\'searchRequest.ip\'][value!=\'\'],' +
-				'[name=\'searchRequest.keyword\'][value!=\'\'],' +
-				'[name=\'searchRequest.agent\'][value!=\'\'],' +
-				'[name=\'searchRequest.flagType\'][value!=\'\'],' +
-				'[name=\'searchRequest.appealType\'][value!=\'IGNORE\']'
+				'[name="categoryId1stLevel"],' + 
+				'[name="categoryId2ndLevel"][value!=""],' +
+				'[name="searchRequest.scoreGroups"],' +
+				'[name="searchRequest.activeFeatureTypes"],' +
+				'[name="purchaseOrderId"][value!=""],' +
+				'[name="searchRequest.groupedAdState"],' +
+				'[name="searchRequest.dateRangeType"][value!="LAST_WEEK"],' +
+				'[name="idAndEmailField"][value!=""],' +
+				'[name="machId"][value!=""],' +
+				'[name="paymentTransactionId"][value!=""],' +
+				'[name="searchRequest.ip"][value!=""],' +
+				'[name="searchRequest.keyword"][value!=""],' +
+				'[name="searchRequest.agent"][value!=""],' +
+				'[name="searchRequest.flagType"][value!=""],' +
+				'[name="searchRequest.appealType"][value!="IGNORE"]'
 			).serialize();
 
 			if (searchParams.length > 0) {
@@ -367,10 +375,7 @@ function initApplication(externalJQuery) {
 		// Highlight the bad stuff in replies
 		function hlReplyRisks() {
 
-			// Function to highlight an element in red (accepts a jQuery object returns nothing)
-			var h = function(e) { e.css('padding', '1px 2px').css('background-color', COLOUR_RED_HIGHLIGHT) };
-
-			h($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
+			hlRed($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
 		}
 
 		// Hide Gumtree boilerplate in replies
@@ -383,13 +388,13 @@ function initApplication(externalJQuery) {
 			var repliesWithBoilerplate = $('div.rts-mail-body').filter(function() { return ($(this).text().trim().indexOf('Someone has replied to your ad!') == 0); });
 
 			// Make a little function to replace a bunch of text with an inconspicuous ellipsis
-			var r = function(el, regex) {
+			var collapse = function(el, regex) {
 				el.innerHTML = el.innerHTML.replace(regex, function(matched) {return "<span style='color: #AAA;'>[ ... ]</span>";});
 			}
 
 			repliesWithBoilerplate.each(function() {
-				r(this, boilerplateStartRegex);
-				r(this, boilerplateEndRegex);
+				collapse(this, boilerplateStartRegex);
+				collapse(this, boilerplateEndRegex);
 			});
 		}
 
