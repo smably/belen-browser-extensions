@@ -36,6 +36,7 @@ function initApplication(externalJQuery) {
 		"/1P/e/+J2LbiYfEHQz+ICV1N3yen+3PZf977/9z/Q//X/rf/7M81Ob3pu1EXWIFuZvr7aSVBOx1/uf0P" + 
 		"BEK3/46/gnZOK0l/r5sJVqCp6Xu99/2qt+v+T/9f+L8CSK77v+pt73vf65qaYAVqzPYGXvdTvmR/z/4Z" +
 		"HhfunP0p+3vKF6/79gZqzPQLSYoUAABKPQ+kpVV/igAAAABJRU5ErkJggg==";
+
 	const MAIL_ICON_SRC = "data:image/png;base64," +
 		"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m" +
 		"dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAITSURBVBgZpcHLThNhGIDh9/vn7/RApwc5VCmFWBPi" +
@@ -128,7 +129,7 @@ function initApplication(externalJQuery) {
 
 			// Create mail icon from a data: URI and set attributes
 			var mailIcon = $('<img>').attr('src', MAIL_ICON_SRC);
-			mailIcon.attr('alt', 'Replies to this ad').attr('title', 'Replies to this ad');
+			mailIcon.attr('alt', 'View replies to this ad').attr('title', 'View replies to this ad');
 			mailIcon.css('vertical-align', 'middle').css('margin', '-2px 8px 0 8px').css('border', 'none');
 
 			// Wrap the mail icon in a link and add it after each ad ID
