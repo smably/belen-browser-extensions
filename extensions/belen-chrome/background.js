@@ -245,12 +245,66 @@ function initApplication(externalJQuery) {
 			script.type = 'text/javascript';
 			script.appendChild(document.createTextNode('('+ addResetIcon +')();'));
 			document.body.appendChild(script);
-		}		
+		}
+
+		// Adds links beside each ad to block and unblock all images
+		function initBlockImageLinks() {
+
+			// Function to add "block images" links, to be inserted in an inline script and run in page context
+			var addBlockImageLinks = function() {
+
+				// Some templates for the block/unblock image links
+				var blockImageLink = $('<a></a>').addClass('actn-blckAllImg').text('Block Images').attr('href', '#');
+				var unblockImageLink = $('<a></a>').addClass('actn-ublkAllImg').text('Unblock Images').attr('href', '#');
+
+				// Insert the block/unblock links before the "send ad mail" link in the right sidebar (should be after "block all" link)
+				// Links will only be inserted on ads that have an image div
+				$('div.p-ads-div-imgs').closest('tr.adRow').find('a.actn-rsndRegMail').before(blockImageLink.after(document.createTextNode(' | ')).after(unblockImageLink).after($('<br>')));
+
+				// Given an element in an ad row, return a list of all the image block/unblock/hold/unhold links with the specified link text for that ad
+				var getImageActionLinks = function(eventSrc, linkText) {
+					return $(eventSrc).closest('tr.adRow').find('a.j-img-action').filter(function() {
+						return $(this).text().toUpperCase() == linkText.toUpperCase();
+					});
+				}
+
+				// For each "block images" link, if there are no image block links for the ad, disable it
+				$('a.actn-blckAllImg').each(function() {
+					if (getImageActionLinks(this, 'block').length == 0)
+						$(this).addClass('p-ads-lnk-dsbld');
+				});
+
+				// For each "unblock images" link, if there are no image unblock links for the ad, disable it
+				$('a.actn-ublkAllImg').each(function() {
+					if (getImageActionLinks(this, 'unblock').length == 0)
+						$(this).addClass('p-ads-lnk-dsbld');
+				});
+
+				// Function to click all the links below images (block/unblock, hold/unhold) in the current ad row
+				var clickImageActionLinks = function(eventSrc, linkText, toggleLink) {
+					getImageActionLinks(eventSrc, linkText).click();
+
+					$(eventSrc).addClass('p-ads-lnk-dsbld');
+					$(toggleLink).removeClass('p-ads-lnk-dsbld');
+				};
+
+				// Set the click event on the block/unblock links to block images
+				$('a.actn-blckAllImg').click(function() { clickImageActionLinks(this,   'block', $(this).next('a.actn-ublkAllImg')); });
+				$('a.actn-ublkAllImg').click(function() { clickImageActionLinks(this, 'unblock', $(this).prev('a.actn-blckAllImg')); });
+			};
+
+			// Create a script element, stuff the text of addBlockImageLinks inside an anonymous function and immediately call it, and add all that to the end of the document body
+			var script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.appendChild(document.createTextNode('('+ addBlockImageLinks +')();'));
+			document.body.appendChild(script);
+		}
 
 		createPermalink();
 		initSearchReset();
 		extendKeywordField();
 		linkifyAds();
+		initBlockImageLinks();
 		hlAdRisks();
 		hlSearchTerms();
 	}
