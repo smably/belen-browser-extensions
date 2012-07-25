@@ -100,7 +100,7 @@ function initApplication(externalJQuery) {
 					params = '&searchRequest.groupedAdState=BLOCKED&searchRequest.groupedAdState=BLOCK_ADMIN_CONFIRMED&searchRequest.groupedAdState=DELETED__ADMIN_DELETED';
 				else if ($(this).hasClass('meta-usrads-ok'))
 					params = '&searchRequest.groupedAdState=DELAYED&searchRequest.groupedAdState=ACTIVE__TNS_SCORE_FILTER&searchRequest.groupedAdState=ACTIVE__ADMIN_REVIEWED&searchRequest.groupedAdState=ACTIVE__DELAYED_TIMEOUT';
-				return '?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE' + params + '&idAndEmailField=' + userEmail;
+				return '?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE' + params + '&idAndEmailField=' + encodeURIComponent(userEmail);
 			});
 
 			// Add some informative titles on the new links
@@ -118,7 +118,7 @@ function initApplication(externalJQuery) {
 
 			// Return link based on the text of the element we are linking
 			var generateLinkHref = function(el, queryString) {
-				return '?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH' + queryString + $(el).text();
+				return '?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH' + queryString + encodeURIComponent($(el).text());
 			}
 
 			// Set link hrefs for all the links we have added
