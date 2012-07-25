@@ -13,7 +13,7 @@
 //
 // (This script functions as a component of the Belen Enhancer Firefox add-on as well as a standalone Greasemonkey or Chrome userscript.)
 
-function initApplication(externalJQuery) {
+var initApplication = function(externalJQuery) {
 
 	// We may not be able to access jQuery directly, so we'll just use whatever is passed in... hmmm...
 	$ = externalJQuery;
@@ -60,10 +60,10 @@ function initApplication(externalJQuery) {
 		// Do the stuff in Manage Ads..
 
 		// Remove the maxLength attribute from the search keyword box
-		function extendKeywordField() { $('#srch-kwrd').removeAttr('maxlength'); }
+		var extendKeywordField = function() { $('#srch-kwrd').removeAttr('maxlength'); };
 
 		// Add links to the ad ID, machine ID, and phone number for each ad
-		function linkifyAds() {
+		var linkifyAds = function() {
 
 			// Add links inside elements that do not already have links and return the link added
 			var linkWrap = function(e) {
@@ -139,10 +139,10 @@ function initApplication(externalJQuery) {
 
 				$(this).after(mailIcon.clone().wrap(mailLink).parent());
 			});
-		}
+		};
 
 		// Highlight ads from first-time posters and colour-code user state
-		function hlAdRisks() {
+		var hlAdRisks = function() {
 
 			// Find all adRow tr elements that have a child element of class "meta-usrads-pstd" in which the text is precisely "1"
 			// To those matching tr elements, apply a blue background colour (these are our first-time posters)
@@ -162,10 +162,10 @@ function initApplication(externalJQuery) {
 
 			// Highlight users with at least one note
 			hlRed($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }));
-		}
+		};
 
 		// Highlight keyword search terms
-		function hlSearchTerms() {
+		var hlSearchTerms = function() {
 
 			// If there's a search keyword field and it has terms in it, highlight them in ads
 			if ($('#srch-kwrd').length > 0 && $('#srch-kwrd').val() != "") {
@@ -200,10 +200,10 @@ function initApplication(externalJQuery) {
 				// Set some highlighting on the search terms
 				$('span.highlight').css('background-color', COLOUR_GREEN_HIGHLIGHT).css('font-weight', 'bold');
 			}
-		}
+		};
 
 		// Add a link button to the current page
-		function createPermalink() {
+		var createPermalink = function() {
 			var searchParams = $('#searchForm :' +
 				'[name="categoryId1stLevel"],' + 
 				'[name="categoryId2ndLevel"][value!=""],' +
@@ -229,10 +229,10 @@ function initApplication(externalJQuery) {
 				$('#permalink').attr('href', PATH_MANAGE_ADS + '?formAction=submitSearch&' + searchParams);
 				$('#permalink').attr('target', '_blank');
 			}
-		}
+		};
 
 		// Adds a reset icon to the right of the Search button in the top form. Clicking it resets the values in the search form to their defaults.
-		function initSearchReset() {
+		var initSearchReset = function() {
 
 			// This function is added to an inline script so that it is executed in the page context rather than the extension context.
 			var addResetIcon = function() {
@@ -294,10 +294,10 @@ function initApplication(externalJQuery) {
 			script.type = 'text/javascript';
 			script.appendChild(document.createTextNode('('+ addResetIcon +')();'));
 			document.body.appendChild(script);
-		}
+		};
 
 		// Adds links beside each ad to block and unblock all images
-		function initBlockImageLinks() {
+		var initBlockImageLinks = function() {
 
 			// Function to add "block images" links, to be inserted in an inline script and run in page context
 			var addBlockImageLinks = function() {
@@ -347,7 +347,7 @@ function initApplication(externalJQuery) {
 			script.type = 'text/javascript';
 			script.appendChild(document.createTextNode('('+ addBlockImageLinks +')();'));
 			document.body.appendChild(script);
-		}
+		};
 
 		createPermalink();
 		initSearchReset();
@@ -362,25 +362,25 @@ function initApplication(externalJQuery) {
 	else if (location.pathname == PATH_REPLY_TS) {
 
 		// Set the "ad ID" link to show all replies from that ad, not just the ones from the past day
-		function fixIdLinks() {
+		var fixIdLinks = function() {
 
 			$('#rts-tbl td:first-child p:nth-child(2) a:first-child').attr('href', function() { return $(this).attr('href') + "&daterange=NO_RANGE"; });
-		}
+		};
 
 		// Add links to message IDs (note that they will only work with this extension installed)
-		function linkifyReplies() {
+		var linkifyReplies = function() {
 
 			$('#rts-tbl td:first-child p:nth-child(2)').contents().filter(function() { return $(this).text().trim().match(/^Message ID: \d+$/); }).replaceWith(function() { var m = $(this).text().match(/\d+/)[0]; return 'Message ID: <a href=\'?srch-jumptomessage-id=' + m + '\' target=\'_blank\'>' + m + '</a>'; });
-		}
+		};
 
 		// Highlight the bad stuff in replies
-		function hlReplyRisks() {
+		var hlReplyRisks() = function() {
 
 			hlRed($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
-		}
+		};
 
 		// Hide Gumtree boilerplate in replies
-		function hideBoilerplate() {
+		var hideBoilerplate() = function() {
 
 			// Text at the bottom varies depending on whether or not the user is registered
 			var boilerplateStartRegex = new RegExp('(.|\n)+?Message:');
@@ -397,10 +397,10 @@ function initApplication(externalJQuery) {
 				collapse(this, boilerplateStartRegex);
 				collapse(this, boilerplateEndRegex);
 			});
-		}
+		};
 
 		// Fix all the things in replies
-		function initReplies() {
+		var initReplies = function() {
 
 			// If the results table is not flagged as fixed, immediately set the flag to fixed and then fix all the replies
 			// Conveniently, every time a new search is performed, we get a new results table (with the flag not set, of course)
@@ -412,7 +412,7 @@ function initApplication(externalJQuery) {
 				hlReplyRisks();
 				hideBoilerplate();
 			}
-		}
+		};
 
 		// Watch for elements being added to the reply screening container
 		$('#replyts-screening-results').bind('DOMNodeInserted', initReplies);
@@ -427,7 +427,7 @@ function initApplication(externalJQuery) {
 		$('tr.record td:nth-child(4)').wrapInner(function() { return "<a href='" + PATH_MANAGE_ADS + "?formAction=submitSearch&idAndEmailField=" + $(this).text() + "' target='_blank'>"; });
 		$('tr.record td:nth-child(7)').wrapInner(function() { return "<a href='" + PATH_REPLY_TS + "?ip=" + $(this).text() + "&daterange=LAST_DAY' target='_blank'>"; });
 	}
-}
+};
 
 // Main function
 (function() {
@@ -446,12 +446,12 @@ function initApplication(externalJQuery) {
 	else if (typeof unsafeWindow != 'undefined') {
 		var i = 0;
 
-		function jQuery_wait() {
+		var jQuery_wait = function() {
 			if (i++ < 50 && typeof unsafeWindow.jQuery == 'undefined')
 				window.setTimeout(jQuery_wait, 100);
 			else
 				initApplication(unsafeWindow.jQuery);
-		}
+		};
 
 		jQuery_wait();
 	}
