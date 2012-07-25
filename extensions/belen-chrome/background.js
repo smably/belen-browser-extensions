@@ -1,12 +1,17 @@
 // ==UserScript==
 // @name            Belen Enhancer for Firefox
 // @namespace       http://cs.gumtree.com.au/
-// @version         1.6.0.0
+// @version         1.7.0.1
 // @author          Sylvan Mably
 // @description     Fixes various annoyances in Belen
 // @include         http://cs.gumtree.com.au/*
 // ==/UserScript==
-// (This functions as a component of the Belen Enhancer Firefox add-on as well as a standalone Greasemonkey userscript.)
+//
+// Credits:
+// Silk icons (permalink, search reset) from http://www.famfamfam.com/lab/icons/silk/
+// Everything else by me.
+//
+// (This script functions as a component of the Belen Enhancer Firefox add-on as well as a standalone Greasemonkey or Chrome userscript.)
 
 function initApplication(externalJQuery) {
 
