@@ -36,7 +36,18 @@ function initApplication(externalJQuery) {
 		"/1P/e/+J2LbiYfEHQz+ICV1N3yen+3PZf977/9z/Q//X/rf/7M81Ob3pu1EXWIFuZvr7aSVBOx1/uf0P" + 
 		"BEK3/46/gnZOK0l/r5sJVqCp6Xu99/2qt+v+T/9f+L8CSK77v+pt73vf65qaYAVqzPYGXvdTvmR/z/4Z" +
 		"HhfunP0p+3vKF6/79gZqzPQLSYoUAABKPQ+kpVV/igAAAABJRU5ErkJggg==";
-
+	const EMAIL_ICON_SRC = "data:image/png;base64," +
+		"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m" +
+		"dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAITSURBVBgZpcHLThNhGIDh9/vn7/RApwc5VCmFWBPi" +
+		"1mvwAlx7BW69Afeu3bozcSE7E02ILjCRhRrds8AEbKVS2gIdSjvTmf+TYqLu+zyiqszDMCf75PnnnVwh" +
+		"uNcLpwsXk8Q4BYeSOsWpkqrinJI6JXVK6lSRdDq9PO+19vb37XK13Hj0YLMUTVVyWY//Cf8IVwQEGEeJ" +
+		"N47S1YdPo4npDpNmnDh5udOh1YsZRcph39EaONpnjs65oxsqvZEyTaHdj3n2psPpKDLBcuOOGUWpZDOG" +
+		"+q0S7751ObuYUisJGQ98T/Ct4Fuo5IX+MGZr95jKjRKLlSxXxFxOEmaaN4us1Upsf+1yGk5ZKhp8C74H" +
+		"5ZwwCGO2drssLZZo1ouIcs2MJikz1oPmapHlaoFXH1oMwphyTghyQj+MefG+RblcoLlaJG/5y4zGCTMi" +
+		"kEwTctaxXq/w9kuXdm9Cuzfh9acujXqFwE8xmuBb/hCwl1GKAnGccDwIadQCfD9DZ5Dj494QA2w2qtQW" +
+		"84wmMZ1eyFI1QBVQwV5GiaZOpdsPaSwH5HMZULi9UmB9pYAAouBQbMHHrgQcnQwZV/KgTu1o8PMgipON" +
+		"u2t5KeaNiEkxgAiICDMCCFeEK5aNauAOfoXx8KR9ZOOLk8P7j7er2WBhwWY9sdbDeIJnwBjBWBBAhGsC" +
+		"miZxPD4/7Z98b/0QVWUehjkZ5vQb/Un5e/DIsVsAAAAASUVORK5CYII=";
 
 	if (location.pathname == PATH_MANAGE_ADS) {
 		// Do the stuff in Manage Ads..
@@ -48,7 +59,9 @@ function initApplication(externalJQuery) {
 		function linkifyAds() {
 
 			// Add links inside elements that do not already have links and return any elements to which links were added
-			var w = function(e) { return e.filter(function() { return $(this).attr('x-wrapped') != 'true'; }).attr('x-wrapped', 'true').wrapInner('<a>') };
+			var w = function(e) { return e.filter(function() {
+				return $(this).attr('x-wrapped') != 'true'; }).attr('x-wrapped', 'true').wrapInner('<a>');
+			};
 
 			// When mousing over the history line, make sure the link cursor is off (it gets added after this script is run, so we can't just set it here)
 			$('dd.meta-user-history').bind('mouseover', function(event) { $(this).css('cursor', 'auto') });
@@ -75,23 +88,20 @@ function initApplication(externalJQuery) {
 			$('a.meta-usrads-bad').attr('title', 'View blocked and admin deleted ads from this user');
 
 			// Find the parent elements of the ad ID, machine ID, and phone number, wrap their contents in link tags
-			var adAttributeLinks = w($('dt:contains(\'Ad-Id:\') + dd,dt:contains(\'Machine Id:\') + dd div,dt:contains(\'Phone:\') + dd')).find('a')
+			var adIDLinks = w($('dt:contains("Ad-Id:")').next('dd')).find('a');
+			var machineIDLinks = w($('dt:contains("Machine Id:")').next('dd').find('div')).find('a');
+			var phoneLinks = w($('dt:contains("Phone:")').next('dd')).find('a');
 
-			// Set the href and target attributes on all links according to what kind of link they are
-			adAttributeLinks.attr('href', function() {
-				var t = $(this).closest('dd').prev('dt').text();
-				var p;
-				if (t == 'Ad-Id:')
-					p = '&idAndEmailField=';
-				else if (t == 'Machine Id:')
-					p = '&machId=';
-				else
-					p = '&searchRequest.keyword=';
-				return '?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH' + p + $(this).text();
-			});
+			var generateLinkHref = function(el, queryString) {
+				return '?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH' + queryString + $(el).text();
+			}
+
+			adIDLinks.each(function() { $(this).attr('href', generateLinkHref(this, '&idAndEmailField=')); });
+			machineIDLinks.each(function() { $(this).attr('href', generateLinkHref(this, '&machId=')); });
+			phoneLinks.each(function() { $(this).attr('href', generateLinkHref(this, '&searchRequest.keyword=')); });
 
 			// Add blocked class onto all links inside a blocked dd (preserves red highlighted on blocked machine IDs)
-			adAttributeLinks.attr('target', '_blank').filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
+			adIDLinks.add(machineIDLinks).add(phoneLinks).attr('target', '_blank').filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
 		}
 
 		// Highlight ads from first-time posters and colour-code user state
@@ -235,7 +245,7 @@ function initApplication(externalJQuery) {
 					$('#srch-flgtype option:first-child').attr('selected', 'true');
 				};
 
-				// Create reset icon from a data: url, give it a sensible title and alt text, 
+				// Create reset icon from a data: url, give it a sensible title and alt text, set styles, add a click handler
 				var resetIcon = $('<img>').attr('src', RESET_ICON_SRC);
 				resetIcon.attr('alt', 'Reset search fields').attr('title', 'Reset search');
 				resetIcon.css('vertical-align', 'middle').css('margin', '-4px 2px 0 2px').css('margin-top', '-4px').css('cursor', 'pointer');
