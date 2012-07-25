@@ -1,6 +1,6 @@
 {
   "name": "Belen Enhancer for Chrome",
-  "version": "1.6.0.1",
+  "version": "1.7.0.1",
   "description": "Fixes various annoyances in Belen.",
   "content_scripts": [ {
     "js": [ "jquery-1.7.2.min.js" ],
