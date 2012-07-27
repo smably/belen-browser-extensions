@@ -1,3 +1,6 @@
+// Ad category SELECT boxes are generated based on an HTML string defined in a script block at the bottom of the main page.
+// If we catch the page load at just the right time, we can replace that with our own code.
+// The following HTML generates an indented, rainbow-coloured category list that is hopefully easier to use than the default.
 var catSelectOpts =
 	'<option disabled="disabled" class="cat1-lvl1 cat-lvl1">Automotive</option>' +
 	'<option value="18461" class="cat1-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Automotive Services</option>' +
@@ -244,9 +247,9 @@ var catSelectOpts =
 	'<option value="18618" class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Video Games & Consoles</option>' +
 	'<option value="18615" class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Video Games</option>';
 
-// The category selection box is built using an HTML string contained in the source of the Manage Ads page.
-// In order to change it, we need to swap out the HTML before manageAds.js is run, because it pulls Belen.tns.controller.vars inside an enclosure.
-// If we do this too late, manageAds.js will have already run.
+// In order to the category box HTML, we must swap in our version at the correct time.
+// This must happen before manageAds.js is run, because it pulls Belen.tns.controller.vars inside an enclosure.
+// If we perform the insertion too late, manageAds.js will have already run.
 // Too early and the inline script will redefine Belen.tns.controller.vars and our changes here will not have any effect.
 // We rely on the "beforeload" event (WebKit only), which runs before external resources, such a scripts, are processed.
 // We want to run this code right before manageAds.js, but after the inline JS has run.
@@ -267,6 +270,8 @@ function setCatSelectOpts(evt) {
 		var newStyleText = ".cat-lvl1 { color: #FFF; }\n";
 		newStyleText += ".cat-lvl2,.cat-lvl3 { color: #000; }\n\n";
 
+		// Pretty colours generated using hand-picked hues beginning here:
+		// http://tristen.ca/hcl-picker/#/clh/6/0/6C2E23/FEC7A9
 		newStyleText +=
 			".cat1-lvl1,.cat2-lvl1 { background-color: #8F4738; }\n" +
 			".cat3-lvl1            { background-color: #7C5320; }\n" +

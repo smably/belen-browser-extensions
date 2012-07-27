@@ -7,10 +7,6 @@
 // @include         http://cs.gumtree.com.au/*
 // ==/UserScript==
 //
-// Credits:
-// Silk icons (permalink, search reset) from http://www.famfamfam.com/lab/icons/silk/
-// Everything else by me.
-//
 // (This script functions as a component of the Belen Enhancer Firefox add-on as well as a standalone Greasemonkey or Chrome userscript.)
 
 var initApplication = function(externalJQuery) {
