@@ -1,25 +1,22 @@
 {
-  "name": "Belen Enhancer for Chrome",
-  "version": "1.7.0.1",
-  "description": "Fixes various annoyances in Belen.",
-  "content_scripts": [ {
-    "js": [ "jquery-1.7.2.min.js" ],
-    "matches": [ "http://cs.gumtree.com.au/*"],
-    "run_at": "document_start"
-  },
-  {
-    "js": [ "replyts_jumptomessage.js" ],
-    "matches": [ "http://cs.gumtree.com.au/replyts/screening.do*"],
-    "run_at": "document_start"
-  },
-  {
-    "js": [ "category_list.js" ],
-    "matches": [ "http://cs.gumtree.com.au/searchAds.do*"],
-    "run_at": "document_start"
-  },
-  {
-    "js": [ "background.js" ],
-    "matches": [ "http://cs.gumtree.com.au/*"],
-    "run_at": "document_idle"
-  }]
+	"name": "Belen Enhancer for Chrome",
+	"version": "1.8.0.0",
+	"description": "Fixes various annoyances in Belen.",
+	"content_scripts": [ 
+		{
+			"js": [ "replyts_jumptomessage.js" ],
+			"matches": [ "http://cs.gumtree.com.au/replyts/screening.do*" ],
+			"run_at": "document_start"
+		},
+		{
+			"js": [ "category_list.js" ],
+			"matches": [ "http://cs.gumtree.com.au/searchAds.do*" ],
+			"run_at": "document_start"
+		},
+		{
+			"js": [ "background.js" ],
+			"matches": [ "http://cs.gumtree.com.au/*" ],
+			"run_at": "document_idle"
+		}
+	]
 }

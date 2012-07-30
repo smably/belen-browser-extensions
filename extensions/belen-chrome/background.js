@@ -9,21 +9,24 @@
 //
 // (This script functions as a component of the Belen Enhancer Firefox add-on as well as a standalone Greasemonkey or Chrome userscript.)
 
-var initApplication = function(externalJQuery) {
+var jQuery, $, Belen;
 
-	// We may not be able to access jQuery directly, so we'll just use whatever is passed in... hmmm...
-	$ = externalJQuery;
+var initApplication = function() {
 
 	// Constants!
-	const FREEMAIL_REGEX = /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|rocketmail\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i;
+	const FREEMAIL_REGEX         = /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|rocketmail\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i;
 
-	const PATH_MANAGE_ADS = "/searchAds.do";
-	const PATH_REPLY_TS = "/replyts/screening.do";
-	const PATH_SPAM_REPORT = "/spam-report.do";
+	const PATH_MANAGE_ADS        = "/searchAds.do";
+	const PATH_REPLY_TS          = "/replyts/screening.do";
+	const PATH_SPAM_REPORT       = "/spam-report.do";
+	const PATH_JQUERY            = "/js/lib/jquery-1.4.2.min.js";
 
 	const COLOUR_GREEN_HIGHLIGHT = "#BEA";
-	const COLOUR_RED_HIGHLIGHT = "#FCB";
+	const COLOUR_RED_HIGHLIGHT   = "#FCB";
 	const COLOUR_BLUE_BACKGROUND = "#E3EDFA";
+
+	const JQUERY_WAIT_PERIOD_MS  = "100";
+	const JQUERY_WAIT_TIMEOUT_MS = "1000";
 
 	const LINK_ICON_SRC = "data:image/png;base64," +
 		"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m" +
@@ -51,9 +54,43 @@ var initApplication = function(externalJQuery) {
 		$(e).css('padding', '1px 2px').css('background-color', COLOUR_RED_HIGHLIGHT)
 	};
 
+	// Function to insert jQuery if it does not already exist in the page
+	// If successful, runs the callback function passed in
+	const injectJQuery = function(callback) {
 
+		// Make sure we don't already have a jQuery defined
+		if (typeof jQuery == 'undefined') {
+
+			// Create a script element, set its src to the jQuery path, and add it to the end of the document body
+			var script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.src = PATH_JQUERY;
+			document.body.appendChild(script);
+
+			// Function that waits for jQuery to load and then does something
+			var jQueryWait = function(remainingWait, callback) {
+
+				// If we don't have a jQuery yet and we haven't timed out, decrement our remaining time and schedule our next check
+				if (typeof jQuery == 'undefined' && remainingWait > 0) {
+					remainingWait -= JQUERY_WAIT_PERIOD_MS;
+					setTimeout(function() { jQueryWait(remainingWait, callback) }, JQUERY_WAIT_PERIOD_MS);
+				}
+
+				// Otherwise, if we do have a jQuery and we have a valid callback function, run the callback
+				else if (typeof jQuery != 'undefined' && typeof callback == 'function') {
+					callback();
+				}
+
+				// (If we've timed out and still don't have a jQuery, just exit silently)
+			}
+
+			// Start waiting for jQuery
+			jQueryWait(JQUERY_WAIT_TIMEOUT_MS, callback);
+		}
+	}
+
+	// Do the stuff in Manage Ads..
 	if (location.pathname == PATH_MANAGE_ADS) {
-		// Do the stuff in Manage Ads..
 
 		// Remove the maxLength attribute from the search keyword box
 		var extendKeywordField = function() { $('#srch-kwrd').removeAttr('maxlength'); };
@@ -227,129 +264,110 @@ var initApplication = function(externalJQuery) {
 			}
 		};
 
-		// Adds a reset icon to the right of the Search button in the top form. Clicking it resets the values in the search form to their defaults.
-		var initSearchReset = function() {
+		// This function is added to an inline script so that it is executed in the page context rather than the extension context.
+		var addResetIcon = function() {
 
-			// This function is added to an inline script so that it is executed in the page context rather than the extension context.
-			var addResetIcon = function() {
+			// This can't be defined at the top of the page with the other consts.
+			// Due to the hack we are using to execute this code in the page context (needed for access to multiSelectUpdateSelected), the entire function must be self-contained.
+			const RESET_ICON_SRC = 'data:image/png;base64,' +
+				'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m' +
+				'dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAHsSURBVDjLtZPpTlpRFIV5Dt7AOESr1kYNThGnSomI' +
+				'ihPoNVi5Qp3RgBgvEERpRW1BRBAcMEDUtIkdjKk4otK0Jdr2vgxZ3kA0MYoaG3+cX2evb529zt4sAKz/' +
+				'OawnASgCBNm5LaE7vjVDutkA4mMdLV4TkvcCuvba2Iqd1pDhWA33mQU+2oXVv07YfpoxuNWFuqVXoeqF' +
+				'CnZcgJwRm04p+Gk3Fs9t8PyZx/K5Hfbf03CGLRj62g2+rSR0K0D+vZXUB1Xw/ou5usJWjAaU0Gz3w/rj' +
+				'Hey/ZjDLvKTD34KSyXzyBkC2JaYd4feMqyNa3OQTREQePlXjrqSq5ssj5hMjTMd66ALDKDLm0jcA0s+N' +
+				'ID6JIFmvQaNXANEKX3l5x7NyqTcb7Zg8GYtCOLoXuPcbha6XV0VlU4WUzE9gPKjF2CGFbE3G3QAmafDn' +
+				'ShETF3iKTZyIblcNza4Syi/deD6USscFCJwV6Fwn8NonQak5Hy1L9TAcjkJ/oAG1p0a1hYdnfcnkrQCB' +
+				'oxyyNYLp1YCJoB7GIwqGgxGod/oZsQoNDiHSepNCceeAN8uF1CvGxJE25rofc+3blKPqQ2VUnKxIYN85' +
+				'yty3eWh216LeKUTOSCayVGlIH0g5S+1JJB+8Cxxt1rWkH7WNTNIPAlwA9Gm7OcXUHxUAAAAASUVORK5C' +
+				'YII=';
 
-				// This can't be defined at the top of the page with the other consts.
-				// Due to the hack we are using to execute this code in the page context (needed for access to multiSelectUpdateSelected), the entire function must be self-contained.
-				const RESET_ICON_SRC = 'data:image/png;base64,' +
-					'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m' +
-					'dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAHsSURBVDjLtZPpTlpRFIV5Dt7AOESr1kYNThGnSomI' +
-					'ihPoNVi5Qp3RgBgvEERpRW1BRBAcMEDUtIkdjKk4otK0Jdr2vgxZ3kA0MYoaG3+cX2evb529zt4sAKz/' +
-					'OawnASgCBNm5LaE7vjVDutkA4mMdLV4TkvcCuvba2Iqd1pDhWA33mQU+2oXVv07YfpoxuNWFuqVXoeqF' +
-					'CnZcgJwRm04p+Gk3Fs9t8PyZx/K5Hfbf03CGLRj62g2+rSR0K0D+vZXUB1Xw/ou5usJWjAaU0Gz3w/rj' +
-					'Hey/ZjDLvKTD34KSyXzyBkC2JaYd4feMqyNa3OQTREQePlXjrqSq5ssj5hMjTMd66ALDKDLm0jcA0s+N' +
-					'ID6JIFmvQaNXANEKX3l5x7NyqTcb7Zg8GYtCOLoXuPcbha6XV0VlU4WUzE9gPKjF2CGFbE3G3QAmafDn' +
-					'ShETF3iKTZyIblcNza4Syi/deD6USscFCJwV6Fwn8NonQak5Hy1L9TAcjkJ/oAG1p0a1hYdnfcnkrQCB' +
-					'oxyyNYLp1YCJoB7GIwqGgxGod/oZsQoNDiHSepNCceeAN8uF1CvGxJE25rofc+3blKPqQ2VUnKxIYN85' +
-					'yty3eWh216LeKUTOSCayVGlIH0g5S+1JJB+8Cxxt1rWkH7WNTNIPAlwA9Gm7OcXUHxUAAAAASUVORK5C' +
-					'YII=';
+			// Reset all form values to their defaults
+			var resetSearch = function() {
 
-				// Reset all form values to their defaults
-				var resetSearch = function() {
-
-					// These variables are necessary for multiSelect operations
-					var messageVars = Belen.tns.controller.vars.messages;
-					var o = {
-						oneOrMoreSelected: messageVars.selectStatOneOrMoreSelected,
-						selectAllText: messageVars.selectStatSelectAll,
-						noneSelected: messageVars.selectStatNoneSelected
-					};
-
-					// Reset all the multiSelects
-					$('div.multiSelectOptions').find('INPUT:checkbox').attr('checked', false).parent().removeClass('checked');
-					$('#srch-subcat').html("<option value=''>&nbsp;</option>");
-					$('div.multiSelectOptions').multiSelectUpdateSelected(o);
-
-					// Reset the regular selects and the text inputs
-					$('#ads-srchfrm-params input.c-inpt-frm').val('');
-					$('#ads-srchfrm-params select.c-slct-frm option').removeAttr('selected');
-
-					// Restore default form values
-					// Date range = "Within the last week"
-					$('#srch-dtrng option[value="LAST_WEEK"]').attr('selected', 'true');
-					// Flags = "[no restriction]", Appeals = "[Ignore]"
-					$('#srch-flgtype option:first-child').attr('selected', 'true');
+				// These variables are necessary for multiSelect operations
+				var messageVars = Belen.tns.controller.vars.messages;
+				var o = {
+					oneOrMoreSelected: messageVars.selectStatOneOrMoreSelected,
+					selectAllText: messageVars.selectStatSelectAll,
+					noneSelected: messageVars.selectStatNoneSelected
 				};
 
-				// Create reset icon from a data: url, give it a sensible title and alt text, set styles, add a click handler
-				var resetIcon = $('<img>').attr('src', RESET_ICON_SRC);
-				resetIcon.attr('alt', 'Reset search fields').attr('title', 'Reset search');
-				resetIcon.css('vertical-align', 'middle').css('margin', '-4px 2px 0 2px').css('margin-top', '-4px').css('cursor', 'pointer');
-				resetIcon.click(resetSearch);
+				// Reset all the multiSelects
+				$('div.multiSelectOptions').find('INPUT:checkbox').attr('checked', false).parent().removeClass('checked');
+				$('#srch-subcat').html("<option value=''>&nbsp;</option>");
+				$('div.multiSelectOptions').multiSelectUpdateSelected(o);
 
-				// Add the reset icon immediately after the search button
-				$('#srch-sbmt').after(resetIcon);
+				// Reset the regular selects and the text inputs
+				$('#ads-srchfrm-params input.c-inpt-frm').val('');
+				$('#ads-srchfrm-params select.c-slct-frm option').removeAttr('selected');
+
+				// Restore default form values
+				// Date range = "Within the last week"
+				$('#srch-dtrng option[value="LAST_WEEK"]').attr('selected', 'true');
+				// Flags = "[no restriction]", Appeals = "[Ignore]"
+				$('#srch-flgtype option:first-child').attr('selected', 'true');
 			};
 
-			// Create a script element, stuff the text of addResetIcon inside an anonymous function and immediately call it, and add all that to the end of the document body
-			var script = document.createElement('script');
-			script.type = 'text/javascript';
-			script.appendChild(document.createTextNode('('+ addResetIcon +')();'));
-			document.body.appendChild(script);
+			// Create reset icon from a data: url, give it a sensible title and alt text, set styles, add a click handler
+			var resetIcon = $('<img>').attr('src', RESET_ICON_SRC);
+			resetIcon.attr('alt', 'Reset search fields').attr('title', 'Reset search');
+			resetIcon.css('vertical-align', 'middle').css('margin', '-4px 2px 0 2px').css('margin-top', '-4px').css('cursor', 'pointer');
+			resetIcon.click(resetSearch);
+
+			// Add the reset icon immediately after the search button
+			$('#srch-sbmt').after(resetIcon);
 		};
 
 		// Adds links beside each ad to block and unblock all images
-		var initBlockImageLinks = function() {
+		var addBlockImageLinks = function() {
 
-			// Function to add "block images" links, to be inserted in an inline script and run in page context
-			var addBlockImageLinks = function() {
+			// Some templates for the block/unblock image links
+			var blockImageDiv = $('<div></div>');
+			var blockImageLink = $('<a></a>').addClass('actn-blckAllImg').text('Block Images').attr('href', '#');
+			var unblockImageLink = $('<a></a>').addClass('actn-ublkAllImg').text('Unblock Images').attr('href', '#');
 
-				// Some templates for the block/unblock image links
-				var blockImageLink = $('<a></a>').addClass('actn-blckAllImg').text('Block Images').attr('href', '#');
-				var unblockImageLink = $('<a></a>').addClass('actn-ublkAllImg').text('Unblock Images').attr('href', '#');
+			// Insert the block/unblock links before the "send ad mail" link in the right sidebar (should be after "block all" link)
+			// Links will only be inserted on ads that have an image div
+			$('div.p-ads-div-imgs').closest('tr.adRow').find('a.actn-rsndRegMail').before(blockImageDiv.append(blockImageLink).append(" | ").append(unblockImageLink));
 
-				// Insert the block/unblock links before the "send ad mail" link in the right sidebar (should be after "block all" link)
-				// Links will only be inserted on ads that have an image div
-				$('div.p-ads-div-imgs').closest('tr.adRow').find('a.actn-rsndRegMail').before(blockImageLink.after(document.createTextNode(' | ')).after(unblockImageLink).after($('<br>')));
-
-				// Given an element in an ad row, return a list of all the image block/unblock/hold/unhold links with the specified link text for that ad
-				var getImageActionLinks = function(eventSrc, linkText) {
-					return $(eventSrc).closest('tr.adRow').find('a.j-img-action').filter(function() {
-						return $(this).text().toUpperCase() == linkText.toUpperCase();
-					});
-				}
-
-				// For each "block images" link, if there are no image block links for the ad, disable it
-				$('a.actn-blckAllImg').each(function() {
-					if (getImageActionLinks(this, 'block').length == 0)
-						$(this).addClass('p-ads-lnk-dsbld');
+			// Given an element in an ad row, return a list of all the image block/unblock/hold/unhold links with the specified link text for that ad
+			var getImageActionLinks = function(eventSrc, linkText) {
+				return $(eventSrc).closest('tr.adRow').find('a.j-img-action').filter(function() {
+					return $(this).text().toUpperCase() == linkText.toUpperCase();
 				});
+			}
 
-				// For each "unblock images" link, if there are no image unblock links for the ad, disable it
-				$('a.actn-ublkAllImg').each(function() {
-					if (getImageActionLinks(this, 'unblock').length == 0)
-						$(this).addClass('p-ads-lnk-dsbld');
-				});
+			// For each "block images" link, if there are no image block links for the ad, disable it
+			$('a.actn-blckAllImg').each(function() {
+				if (getImageActionLinks(this, 'block').length == 0)
+					$(this).addClass('p-ads-lnk-dsbld');
+			});
 
-				// Function to click all the links below images (block/unblock, hold/unhold) in the current ad row
-				var clickImageActionLinks = function(eventSrc, linkText, toggleLink) {
-					getImageActionLinks(eventSrc, linkText).click();
+			// For each "unblock images" link, if there are no image unblock links for the ad, disable it
+			$('a.actn-ublkAllImg').each(function() {
+				if (getImageActionLinks(this, 'unblock').length == 0)
+					$(this).addClass('p-ads-lnk-dsbld');
+			});
 
-					$(eventSrc).addClass('p-ads-lnk-dsbld');
-					$(toggleLink).removeClass('p-ads-lnk-dsbld');
-				};
+			// Function to click all the links below images (block/unblock, hold/unhold) in the current ad row
+			var clickImageActionLinks = function(eventSrc, linkText, toggleLink) {
+				getImageActionLinks(eventSrc, linkText).click();
 
-				// Set the click event on the block/unblock links to block images
-				$('a.actn-blckAllImg').click(function() { clickImageActionLinks(this,   'block', $(this).next('a.actn-ublkAllImg')); });
-				$('a.actn-ublkAllImg').click(function() { clickImageActionLinks(this, 'unblock', $(this).prev('a.actn-blckAllImg')); });
+				$(eventSrc).addClass('p-ads-lnk-dsbld');
+				$(toggleLink).removeClass('p-ads-lnk-dsbld');
 			};
 
-			// Create a script element, stuff the text of addBlockImageLinks inside an anonymous function and immediately call it, and add all that to the end of the document body
-			var script = document.createElement('script');
-			script.type = 'text/javascript';
-			script.appendChild(document.createTextNode('('+ addBlockImageLinks +')();'));
-			document.body.appendChild(script);
+			// Set the click event on the block/unblock links to block images
+			$('a.actn-blckAllImg').click(function() { clickImageActionLinks(this,   'block', $(this).next('a.actn-ublkAllImg')); });
+			$('a.actn-ublkAllImg').click(function() { clickImageActionLinks(this, 'unblock', $(this).prev('a.actn-blckAllImg')); });
 		};
 
 		createPermalink();
-		initSearchReset();
+		addResetIcon();
 		extendKeywordField();
 		linkifyAds();
-		initBlockImageLinks();
+		addBlockImageLinks();
 		hlAdRisks();
 		hlSearchTerms();
 	}
@@ -418,38 +436,41 @@ var initApplication = function(externalJQuery) {
 	// Do the stuff in the spam reports
 	else if (location.pathname == PATH_SPAM_REPORT) {
 
-		// Wrap message IDs and ad IDs in links
-		$('tr.record td:nth-child(3)').wrapInner(function() { return "<a href='" + PATH_REPLY_TS + "?srch-jumptomessage-id=" + $(this).text() + "' target='_blank'>"; });
-		$('tr.record td:nth-child(4)').wrapInner(function() { return "<a href='" + PATH_MANAGE_ADS + "?formAction=submitSearch&idAndEmailField=" + $(this).text() + "' target='_blank'>"; });
-		$('tr.record td:nth-child(7)').wrapInner(function() { return "<a href='" + PATH_REPLY_TS + "?ip=" + $(this).text() + "&daterange=LAST_DAY' target='_blank'>"; });
+		// Add links to message IDs, ad IDs, and IPs in the spam report
+		var linkifySpamReport = function() {
+			// Wrap message IDs and ad IDs in links
+			$('tr.record td:nth-child(3)').wrapInner(function() { return "<a href='" + PATH_REPLY_TS + "?srch-jumptomessage-id=" + $(this).text() + "' target='_blank'>"; });
+			$('tr.record td:nth-child(4)').wrapInner(function() { return "<a href='" + PATH_MANAGE_ADS + "?formAction=submitSearch&idAndEmailField=" + $(this).text() + "' target='_blank'>"; });
+			$('tr.record td:nth-child(7)').wrapInner(function() { return "<a href='" + PATH_REPLY_TS + "?ip=" + $(this).text() + "&daterange=LAST_DAY' target='_blank'>"; });
+		}
+
+		// No jQuery by default, so add it in and pass our linkify function in as a callback
+		injectJQuery(linkifySpamReport);
 	}
 };
 
 // Main function
 (function() {
 
-	// First check for a local jQuery and use that if it exists...
-	if (typeof jQuery != 'undefined') {
-		initApplication(jQuery);
+	// If we have an unsafeWindow and it has a jQuery, we are in business...
+	if (typeof unsafeWindow != 'undefined' && typeof unsafeWindow.jQuery != 'undefined') {
+
+		// Just grab our jQuery object from the unsafeWindow and pull it into our script
+		jQuery = unsafeWindow.jQuery;
+		$      = unsafeWindow.jQuery;
+		Belen  = unsafeWindow.Belen;
+
+		initApplication();
 	}
 
-	// If we don't have a local jQuery, maybe the unsafeWindow has one. Use that if it exists...
-	else if (typeof unsafeWindow != 'undefined' && typeof unsafeWindow.jQuery != 'undefined') {
-		initApplication(unsafeWindow.jQuery);
-	}
+	// If we don't have an unsafeWindow, we will have to inject the script into the page and run it in the page context to get access to the page's jQuery (which hopefully exists)
+	else {
 
-	// If all else fails, wait five seconds for the unsafeWindow to get a jQuery and use that if and when it shows up
-	else if (typeof unsafeWindow != 'undefined') {
-		var i = 0;
-
-		var jQuery_wait = function() {
-			if (i++ < 50 && typeof unsafeWindow.jQuery == 'undefined')
-				window.setTimeout(jQuery_wait, 100);
-			else
-				initApplication(unsafeWindow.jQuery);
-		};
-
-		jQuery_wait();
+		// Create a script element, stuff the text of initApplication inside an anonymous function and immediately call it, and add all that to the end of the document body
+		var script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.appendChild(document.createTextNode('('+ initApplication +')();'));
+		document.body.appendChild(script);
 	}
 
 })();

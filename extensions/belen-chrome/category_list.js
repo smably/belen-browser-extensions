@@ -267,8 +267,10 @@ function setCatSelectOpts(evt) {
 		// While we are at it, set up a stylesheet to style the new category select box
 		var newStyle = document.createElement("style");
 		newStyle.setAttribute("type", "text/css");
-		var newStyleText = ".cat-lvl1 { color: #FFF; }\n";
-		newStyleText += ".cat-lvl2,.cat-lvl3 { color: #000; }\n\n";
+		var newStyleText =
+			".cat-lvl1             { color: #FFF; }\n";
+		newStyleText +=
+			".cat-lvl2,.cat-lvl3   { color: #000; }\n\n";
 
 		// Pretty colours generated using hand-picked hues beginning here:
 		// http://tristen.ca/hcl-picker/#/clh/6/0/6C2E23/FEC7A9
