@@ -48,7 +48,21 @@ var initApplication = function() {
 		"84wmMZ1eyFI1QBVQwV5GiaZOpdsPaSwH5HMZULi9UmB9pYAAouBQbMHHrgQcnQwZV/KgTu1o8PMgipON" +
 		"u2t5KeaNiEkxgAiICDMCCFeEK5aNauAOfoXx8KR9ZOOLk8P7j7er2WBhwWY9sdbDeIJnwBjBWBBAhGsC" +
 		"miZxPD4/7Z98b/0QVWUehjkZ5vQb/Un5e/DIsVsAAAAASUVORK5CYII=";
-		
+
+	const RESET_ICON_SRC = 'data:image/png;base64,' +
+		'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m' +
+		'dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAHsSURBVDjLtZPpTlpRFIV5Dt7AOESr1kYNThGnSomI' +
+		'ihPoNVi5Qp3RgBgvEERpRW1BRBAcMEDUtIkdjKk4otK0Jdr2vgxZ3kA0MYoaG3+cX2evb529zt4sAKz/' +
+		'OawnASgCBNm5LaE7vjVDutkA4mMdLV4TkvcCuvba2Iqd1pDhWA33mQU+2oXVv07YfpoxuNWFuqVXoeqF' +
+		'CnZcgJwRm04p+Gk3Fs9t8PyZx/K5Hfbf03CGLRj62g2+rSR0K0D+vZXUB1Xw/ou5usJWjAaU0Gz3w/rj' +
+		'Hey/ZjDLvKTD34KSyXzyBkC2JaYd4feMqyNa3OQTREQePlXjrqSq5ssj5hMjTMd66ALDKDLm0jcA0s+N' +
+		'ID6JIFmvQaNXANEKX3l5x7NyqTcb7Zg8GYtCOLoXuPcbha6XV0VlU4WUzE9gPKjF2CGFbE3G3QAmafDn' +
+		'ShETF3iKTZyIblcNza4Syi/deD6USscFCJwV6Fwn8NonQak5Hy1L9TAcjkJ/oAG1p0a1hYdnfcnkrQCB' +
+		'oxyyNYLp1YCJoB7GIwqGgxGod/oZsQoNDiHSepNCceeAN8uF1CvGxJE25rofc+3blKPqQ2VUnKxIYN85' +
+		'yty3eWh216LeKUTOSCayVGlIH0g5S+1JJB+8Cxxt1rWkH7WNTNIPAlwA9Gm7OcXUHxUAAAAASUVORK5C' +
+		'YII=';
+
+
 	// Function to highlight a set of elements in red (accepts an element or jQuery object, returns nothing)
 	const hlRed = function(e) {
 		$(e).css('padding', '1px 2px').css('background-color', COLOUR_RED_HIGHLIGHT)
@@ -237,6 +251,8 @@ var initApplication = function() {
 
 		// Add a link button to the current page
 		var createPermalink = function() {
+
+			// Grab search parameters from the search form (jQuery selectors use "," for OR and "" -- i.e., concatenations of selectors -- for AND)
 			var searchParams = $('#searchForm :' +
 				'[name="categoryId1stLevel"],' + 
 				'[name="categoryId2ndLevel"][value!=""],' +
@@ -255,32 +271,23 @@ var initApplication = function() {
 				'[name="searchRequest.appealType"][value!="IGNORE"]'
 			).serialize();
 
+			// Only print the permalink if any of the search parameters are not at their default values
 			if (searchParams.length > 0) {
-				$('#pg-topnav a:first-child').before('<a id="permalink"><img id="permalink_icon" src="' + LINK_ICON_SRC + '" /></a> ');
-				$('#permalink_icon').css('border', '0').css('margin-bottom', '-4px').css('margin-right', '4px').attr('alt', 'Permalink').attr('title', 'Permanant link to this search');
+				var permalinkIcon = $('<img>').attr('src', LINK_ICON_SRC);
+				permalinkIcon.attr('alt', 'Permalink').attr('title', 'Permanant link to this search');
+				permalinkIcon.css('border', '0').css('margin-bottom', '-4px').css('margin-right', '4px');
 
-				$('#permalink').attr('href', PATH_MANAGE_ADS + '?formAction=submitSearch&' + searchParams);
-				$('#permalink').attr('target', '_blank');
+				var permalink = $('<a></a>').attr('href',  PATH_MANAGE_ADS + '?formAction=submitSearch&' + searchParams);
+				permalink.attr('target', '_blank');
+
+				// Wrap the permalink icon in the link tag and get the parent (i.e., the linkwrapped permalink icon)
+				// Put that before the menu link at the top of the page
+				$('#pg-topnav a:first-child').before(permalinkIcon.wrap(permalink).parent());
 			}
 		};
 
 		// This function is added to an inline script so that it is executed in the page context rather than the extension context.
 		var addResetIcon = function() {
-
-			// This can't be defined at the top of the page with the other consts.
-			// Due to the hack we are using to execute this code in the page context (needed for access to multiSelectUpdateSelected), the entire function must be self-contained.
-			const RESET_ICON_SRC = 'data:image/png;base64,' +
-				'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m' +
-				'dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAHsSURBVDjLtZPpTlpRFIV5Dt7AOESr1kYNThGnSomI' +
-				'ihPoNVi5Qp3RgBgvEERpRW1BRBAcMEDUtIkdjKk4otK0Jdr2vgxZ3kA0MYoaG3+cX2evb529zt4sAKz/' +
-				'OawnASgCBNm5LaE7vjVDutkA4mMdLV4TkvcCuvba2Iqd1pDhWA33mQU+2oXVv07YfpoxuNWFuqVXoeqF' +
-				'CnZcgJwRm04p+Gk3Fs9t8PyZx/K5Hfbf03CGLRj62g2+rSR0K0D+vZXUB1Xw/ou5usJWjAaU0Gz3w/rj' +
-				'Hey/ZjDLvKTD34KSyXzyBkC2JaYd4feMqyNa3OQTREQePlXjrqSq5ssj5hMjTMd66ALDKDLm0jcA0s+N' +
-				'ID6JIFmvQaNXANEKX3l5x7NyqTcb7Zg8GYtCOLoXuPcbha6XV0VlU4WUzE9gPKjF2CGFbE3G3QAmafDn' +
-				'ShETF3iKTZyIblcNza4Syi/deD6USscFCJwV6Fwn8NonQak5Hy1L9TAcjkJ/oAG1p0a1hYdnfcnkrQCB' +
-				'oxyyNYLp1YCJoB7GIwqGgxGod/oZsQoNDiHSepNCceeAN8uF1CvGxJE25rofc+3blKPqQ2VUnKxIYN85' +
-				'yty3eWh216LeKUTOSCayVGlIH0g5S+1JJB+8Cxxt1rWkH7WNTNIPAlwA9Gm7OcXUHxUAAAAASUVORK5C' +
-				'YII=';
 
 			// Reset all form values to their defaults
 			var resetSearch = function() {
