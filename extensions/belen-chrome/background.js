@@ -363,6 +363,23 @@ var initApplication = function() {
 			$('a.actn-ublkAllImg').click(function() { clickImageActionLinks(this, 'unblock', $(this).prev('a.actn-blckAllImg')); });
 		};
 
+		// Make the "Next" button at the bottom of the page so actually take you to the next page
+		var fixNextButton = function() {
+
+			// The page defined a click handler for the "Next" button. It is useless.
+			// Undefine it and create our own, which is essentially the same.
+			$('a.next', '#ads-pager').unbind('click').click(function(e){
+				e.preventDefault();
+
+				// Just take the page number already in the form, increment it, and put it back
+				// TODO if page num is greater than number of results, set next button to disabled and remove click handler
+				$('#srch-pgnum').val(Number($('#srch-pgnum').val()) + 1);
+				$('#srch-frmactn').val('submitSearch');
+				$('#searchForm').submit();
+				$('#pg-ldr').fadeIn('fast'); 
+			});
+		}
+
 		createPermalink();
 		addResetIcon();
 		extendKeywordField();
@@ -370,6 +387,7 @@ var initApplication = function() {
 		addBlockImageLinks();
 		hlAdRisks();
 		hlSearchTerms();
+		fixNextButton();
 	}
 
 	// Do the stuff in ReplyTS
