@@ -62,10 +62,9 @@ var initApplication = function() {
 		'yty3eWh216LeKUTOSCayVGlIH0g5S+1JJB+8Cxxt1rWkH7WNTNIPAlwA9Gm7OcXUHxUAAAAASUVORK5C' +
 		'YII=';
 
-
 	// Function to highlight a set of elements in red (accepts an element or jQuery object, returns nothing)
-	const hlRed = function(e) {
-		$(e).css('padding', '1px 2px').css('background-color', COLOUR_RED_HIGHLIGHT)
+	const HL_RED = function(e) {
+		$(e).css('padding', '1px 2px').css('background-color', COLOUR_RED_HIGHLIGHT);
 	};
 
 	// Function to insert jQuery if it does not already exist in the page
@@ -196,19 +195,19 @@ var initApplication = function() {
 			$('tr.adRow').has($('span.meta-usrads-pstd').filter(function() { return $(this).text() == '1'; })).css('background-color', COLOUR_BLUE_BACKGROUND);
 
 			// Highlight all scores >0
-			hlRed($('dd.meta-scr').filter(function() { return $(this).text().trim() != '0'; }));
+			HL_RED($('dd.meta-scr').filter(function() { return $(this).text().trim() != '0'; }));
 
 			// Highlight, live (untested), blocked, and deleted ad status in red
-			hlRed($('dd.meta-status:contains("Live \(Untested\)"),dd.meta-status:contains("Blocked"),dd.meta-status:contains("Deleted \(Admin\)")'));
+			HL_RED($('dd.meta-status:contains("Live \(Untested\)"),dd.meta-status:contains("Blocked"),dd.meta-status:contains("Deleted \(Admin\)")'));
 
 			// Highlight freemail domains
-			hlRed($('dd.meta-email :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
+			HL_RED($('dd.meta-email :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
 
 			// Highlight users with at least one bad ad (blocked or admin deleted)
-			hlRed($('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })));
+			HL_RED($('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })));
 
 			// Highlight users with at least one note
-			hlRed($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }));
+			HL_RED($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }));
 		};
 
 		// Highlight keyword search terms
@@ -415,7 +414,7 @@ var initApplication = function() {
 		// Highlight the bad stuff in replies
 		var hlReplyRisks = function() {
 
-			hlRed($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
+			HL_RED($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
 		};
 
 		// Hide Gumtree boilerplate in replies
