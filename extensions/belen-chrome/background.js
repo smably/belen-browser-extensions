@@ -28,6 +28,9 @@ var initApplication = function() {
 	const JQUERY_WAIT_PERIOD_MS  = "100";
 	const JQUERY_WAIT_TIMEOUT_MS = "1000";
 
+	const FLAG_BOLD              = true;
+	const FLAG_NO_BOLD           = false;
+
 	const LINK_ICON_SRC = "data:image/png;base64," +
 		"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m" +
 		"dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADpSURBVCjPY/jPgB8y0EmBHXdWaeu7ef9rHuaY50jU" + 
@@ -62,9 +65,9 @@ var initApplication = function() {
 		'yty3eWh216LeKUTOSCayVGlIH0g5S+1JJB+8Cxxt1rWkH7WNTNIPAlwA9Gm7OcXUHxUAAAAASUVORK5C' +
 		'YII=';
 
-	// Function to highlight a set of elements in red (accepts an element or jQuery object, returns nothing)
-	const HL_RED = function(e) {
-		$(e).css('padding', '1px 2px').css('background-color', COLOUR_RED_HIGHLIGHT);
+	// Function to highlight a set of elements in a chosen colour (accepts an element or jQuery object, returns nothing)
+	const SET_HIGHLIGHT = function(e, colour) {
+		$(e).css('padding', '1px 2px').css('background-color', colour);
 	};
 
 	// Function to insert jQuery if it does not already exist in the page
@@ -195,19 +198,19 @@ var initApplication = function() {
 			$('tr.adRow').has($('span.meta-usrads-pstd').filter(function() { return $(this).text() == '1'; })).css('background-color', COLOUR_BLUE_BACKGROUND);
 
 			// Highlight all scores >0
-			HL_RED($('dd.meta-scr').filter(function() { return $(this).text().trim() != '0'; }));
+			SET_HIGHLIGHT($('dd.meta-scr').filter(function() { return $(this).text().trim() != '0'; }), COLOUR_RED_HIGHLIGHT);
 
 			// Highlight, live (untested), blocked, and deleted ad status in red
-			HL_RED($('dd.meta-status:contains("Live \(Untested\)"),dd.meta-status:contains("Blocked"),dd.meta-status:contains("Deleted \(Admin\)")'));
+			SET_HIGHLIGHT($('dd.meta-status:contains("Live \(Untested\)"),dd.meta-status:contains("Blocked"),dd.meta-status:contains("Deleted \(Admin\)")'), COLOUR_RED_HIGHLIGHT);
 
 			// Highlight freemail domains
-			HL_RED($('dd.meta-email :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
+			SET_HIGHLIGHT($('dd.meta-email :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }), COLOUR_RED_HIGHLIGHT);
 
 			// Highlight users with at least one bad ad (blocked or admin deleted)
-			HL_RED($('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })));
+			SET_HIGHLIGHT($('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })), COLOUR_RED_HIGHLIGHT);
 
 			// Highlight users with at least one note
-			HL_RED($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }));
+			SET_HIGHLIGHT($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }), COLOUR_RED_HIGHLIGHT);
 		};
 
 		// Highlight keyword search terms
@@ -225,6 +228,7 @@ var initApplication = function() {
 					// Escape special regex characters!
 					str = str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 
+					// FIXME highlight should just set class "highlight" -- css gets set below
 					var regex = new RegExp(str, 'gi');
 					var highlight = "<span style='background-color: " + COLOUR_GREEN_HIGHLIGHT + "; font-weight: bold;'>$&</span>";
 
@@ -386,6 +390,83 @@ var initApplication = function() {
 			});
 		}
 
+		// Adds some visual cues to the scoring summary tooltip:
+		// Positive (bad) scores are highlighted in red; negative (good) scores are highlighted in green
+		var highlightScoringSummary = function() {
+
+			// Event handler for DOMNodeInserted
+			var handleTooltip = function(event) {
+				var el = event.target;
+
+				// If the insertion was a tooltip and it has children...
+				if ($(el).hasClass("c-tooltip") && $(el).children().length > 0) {
+
+					// And the first child is a tooltip body that contains the text of the scoring summary...
+					var tooltip = $(el).children().first();
+					if (tooltip.hasClass("c-tooltip-bdy") && tooltip.text().indexOf("TOTAL (RISK + POLICY)") >= 0) {
+
+						// Split it up by lines and deal with each line in turn
+						var scoreLines = tooltip.html().split("<br>");
+
+						var regularDiv = $("<div></div>");
+						var hiddenDiv = $("<div></div>").css("color", "#CCC");
+
+						var tooltipNewHTML = "";
+
+						// Function to highlight filters entries in the scoring summary
+						var highlightMatchingFilters = function(wrapElement, lineText, highlightColour, boldFlag) {
+
+							// We only care about lines that start with four spaces (the rest are section headers)
+							if (lineText.match(/^&nbsp;&nbsp;&nbsp;&nbsp;/)) {
+								SET_HIGHLIGHT(wrapElement, highlightColour);
+
+								if (boldFlag == FLAG_BOLD) {
+									wrapElement.css("font-weight", "bold");
+								}
+							}
+						}
+
+						// For each line in the scoring summary, wrap it in a div, highlight if necessay, and add to the HTML for the new tooltip we're building
+						$.each(scoreLines, function() {
+							var scoreLine = $.trim(this);
+
+							if (scoreLine.length > 0) {
+								var wrapDiv;
+
+								if (scoreLine.match(/\(\+0\)/)) {
+									wrapDiv = hiddenDiv.clone();
+								}
+								else if (scoreLine.match(/\(\+\d{3,}\)/)) {
+									wrapDiv = regularDiv.clone();
+									highlightMatchingFilters(wrapDiv, scoreLine, COLOUR_RED_HIGHLIGHT, FLAG_BOLD);
+								}
+								else if (scoreLine.match(/\(\+\d{1,2}\)/)) {
+									wrapDiv = regularDiv.clone();
+									highlightMatchingFilters(wrapDiv, scoreLine, COLOUR_RED_HIGHLIGHT, FLAG_NO_BOLD);
+								}
+								else if (scoreLine.match(/\(\-\d+\)/)) {
+									wrapDiv = regularDiv.clone();
+									highlightMatchingFilters(wrapDiv, scoreLine, COLOUR_GREEN_HIGHLIGHT, FLAG_NO_BOLD);
+								}
+								else {
+									wrapDiv = regularDiv.clone();
+								}
+
+								wrapDiv[0].innerHTML = scoreLine;
+								tooltipNewHTML += wrapDiv[0].outerHTML;
+							}
+						});
+
+						// Set our tooltip to the HTML with the pretty highlighting
+						tooltip.html(tooltipNewHTML);
+					}
+				}
+			}
+
+			// Wait for new DOM nodes and deal with them
+			$(document).bind('DOMNodeInserted', handleTooltip);
+		}
+
 		createPermalink();
 		addResetIcon();
 		extendKeywordField();
@@ -394,6 +475,7 @@ var initApplication = function() {
 		hlAdRisks();
 		hlSearchTerms();
 		fixNextButton();
+		highlightScoringSummary();
 	}
 
 	// Do the stuff in ReplyTS
@@ -414,7 +496,7 @@ var initApplication = function() {
 		// Highlight the bad stuff in replies
 		var hlReplyRisks = function() {
 
-			HL_RED($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }));
+			SET_HIGHLIGHT($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }), COLOUR_RED_HIGHLIGHT);
 		};
 
 		// Hide Gumtree boilerplate in replies
