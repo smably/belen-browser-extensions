@@ -467,10 +467,19 @@ var initApplication = function() {
 			$(document).bind('DOMNodeInserted', handleTooltip);
 		}
 
+		// Set borders between ad rows to improve visual separation
+		var addAdSeparators = function() {
+			$("tr.adRow").css("border-bottom", "#888 4px solid");
+			$("tr.adRow > td").css("padding", "15px 5px");
+		}
+
 		// Fix things in the header and search box
 		createPermalink();
 		extendKeywordField();
 		addResetIcon();
+
+		// Add borders between ads
+		addAdSeparators();
 
 		// Add links in ads
 		linkifyAds();
