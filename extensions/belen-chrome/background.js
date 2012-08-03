@@ -467,15 +467,22 @@ var initApplication = function() {
 			$(document).bind('DOMNodeInserted', handleTooltip);
 		}
 
+		// Fix things in the header and search box
 		createPermalink();
-		addResetIcon();
 		extendKeywordField();
+		addResetIcon();
+
+		// Add links in ads
 		linkifyAds();
 		addBlockImageLinks();
+
+		// Add highlighting in ads
 		hlAdRisks();
 		hlSearchTerms();
-		fixNextButton();
 		highlightScoringSummary();
+
+		// Fix things in the footer
+		fixNextButton();
 	}
 
 	// Do the stuff in ReplyTS
