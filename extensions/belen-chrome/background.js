@@ -443,7 +443,7 @@ var initApplication = function() {
 
 					// Reset the value in the search form in case the user goes back and clicks "next" again
 					$('#srch-pgnum').val(pageNum);
-				});
+				}).attr("title", "Go to page " + (pageNum + 2));
 			}
 
 			// No more result pages; disable the next button
