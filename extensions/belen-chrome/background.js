@@ -11,6 +11,14 @@
 
 var jQuery, $, Belen;
 
+// Function to inject a script into the page and run it in the page context (giving access to the page's jQuery)
+var runInPageContext = function(fn) {
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.appendChild(document.createTextNode('('+ fn +')();'));
+	document.body.appendChild(script);
+}
+
 var initApplication = function() {
 
 	// Constants!
@@ -582,6 +590,7 @@ var initApplication = function() {
 		$      = unsafeWindow.jQuery;
 		Belen  = unsafeWindow.Belen;
 
+		initJQueryHook();
 		initApplication();
 	}
 
@@ -589,10 +598,8 @@ var initApplication = function() {
 	else {
 
 		// Create a script element, stuff the text of initApplication inside an anonymous function and immediately call it, and add all that to the end of the document body
-		var script = document.createElement('script');
-		script.type = 'text/javascript';
-		script.appendChild(document.createTextNode('('+ initApplication +')();'));
-		document.body.appendChild(script);
+		runInPageContext(initJQueryHook);
+		runInPageContext(initApplication);
 	}
 
 })();
