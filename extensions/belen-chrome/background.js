@@ -220,7 +220,7 @@ var initApplication = function() {
 			if ($('#srch-kwrd').length > 0 && $('#srch-kwrd').val() != "") {
 
 				// Extract words and quoted strings from search keywords
-				var keywords = $('#srch-kwrd').val().match(/".+?"|\w+/g);
+				var keywords = $('#srch-kwrd').val().match(/".+?"|\S+/g);
 
 				// Helper function to highlight all occurrences of string str in jQuery element el
 				var hl = function(el, str) {
