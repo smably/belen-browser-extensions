@@ -1,13 +1,18 @@
 // ==UserScript==
-// @name            Belen Enhancer for Firefox
+// @name            Belen Enhancer
 // @namespace       http://cs.gumtree.com.au/
-// @version         1.7.0.1
+// @version         1.8.0.0
 // @author          Sylvan Mably
 // @description     Fixes various annoyances in Belen
 // @include         http://cs.gumtree.com.au/*
 // ==/UserScript==
 //
-// (This script functions as a component of the Belen Enhancer Firefox add-on as well as a standalone Greasemonkey or Chrome userscript.)
+// (This script functions as a component of the Belen Enhancer Firefox add-on
+// as well as, in theory, a standalone Greasemonkey or Chrome userscript.
+// Currently not working as a standalone script, as it has a number of external
+// dependencies.)
+//
+// ============================================================================
 
 var jQuery, $, Belen;
 
