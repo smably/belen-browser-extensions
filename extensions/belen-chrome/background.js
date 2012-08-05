@@ -127,11 +127,11 @@ var initApplication = function() {
 
 				// Find any elements that have not yet been wrapped
 				var unwrapped = $(e).filter(function() {
-					return $(this).attr('x-wrapped') != 'true';
+					return $(this).data('wrapped') != true;
 				});
 
 				// Mark them as wrapped
-				unwrapped.attr('x-wrapped', 'true');
+				unwrapped.data('wrapped', true);
 
 				// Wrap them in link tags and return the link tag added
 				return unwrapped.wrapInner($('<a></a>').attr('target', '_blank')).find('a');
@@ -553,8 +553,8 @@ var initApplication = function() {
 
 			// If the results table is not flagged as fixed, immediately set the flag to fixed and then fix all the replies
 			// Conveniently, every time a new search is performed, we get a new results table (with the flag not set, of course)
-			if ($('#rts-tbl').length > 0 && $('#rts-tbl').attr('x-fixed') != 'true') {
-				$('#rts-tbl').attr('x-fixed', 'true');
+			if ($('#rts-tbl').length > 0 && $('#rts-tbl').data('fixed') != true) {
+				$('#rts-tbl').data('fixed', true);
 
 				fixIdLinks();
 				linkifyReplies();
