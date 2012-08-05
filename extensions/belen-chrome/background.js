@@ -413,18 +413,46 @@ var initApplication = function() {
 		// Make the "Next" button at the bottom of the page so actually take you to the next page
 		var fixNextButton = function() {
 
-			// The page defined a click handler for the "Next" button. It is useless.
-			// Undefine it and create our own, which is essentially the same.
-			$('a.next', '#ads-pager').unbind('click').click(function(e){
-				e.preventDefault();
+			// Current page number (zero-indexed!)
+			var pageNum = Number($('#srch-pgnum').val());
 
-				// Just take the page number already in the form, increment it, and put it back
-				// TODO if page num is greater than number of results, set next button to disabled and remove click handler
-				$('#srch-pgnum').val(Number($('#srch-pgnum').val()) + 1);
-				$('#srch-frmactn').val('submitSearch');
-				$('#searchForm').submit();
-				$('#pg-ldr').fadeIn('fast'); 
-			});
+			// Number of ads per page
+			var adsPerPage = Number($('#searchForm :[name="searchRequest.adsPerPage"][checked]').attr('value'));
+
+			// Number of results
+			var totalResults = Number($('#ads-srchfrm-hits').text().match(/\d+/));
+
+			// Number of result pages
+			var totalPages = Math.ceil(totalResults / adsPerPage);
+
+			// If there are more pages of results to see, turn on the "next" button
+			if ((pageNum + 1) < totalPages) {
+
+				// The page defined a click handler for the "Next" button. It is useless.
+				// Undefine it and create our own, which actually works.
+				$('#ads-pager a.next').unbind('click').click(function(e){
+					e.preventDefault();
+
+					// Just take the page number already in the form, increment it, and put it back
+					$('#srch-pgnum').val(pageNum + 1);
+
+					// Submit the search
+					$('#srch-frmactn').val('submitSearch');
+					$('#searchForm').submit();
+					$('#pg-ldr').fadeIn('fast'); 
+
+					// Reset the value in the search form in case the user goes back and clicks "next" again
+					$('#srch-pgnum').val(pageNum);
+				});
+			}
+
+			// No more result pages; disable the next button
+			else {
+				var nextButton = $('#ads-pager a.next');
+				nextButton.unbind('click').click(function(e){ e.preventDefault(); });
+				nextButton.css("cursor", "default").css("opacity", "0.7");
+				nextButton.attr("title", "No more pages");
+			}
 		}
 
 		// Adds some visual cues to the scoring summary tooltip:
