@@ -176,7 +176,7 @@ var initApplication = function() {
 
 			// Make sure the ad ID link gets the blocked class whenever its parent dd gets set to blocked
 			$.hook(['addClass', 'removeClass']);
-			$('dd.meta-machine').bind('onaddClass',    function(e) { $('a', $(this)).addClass('p-ads-dd-blocked'); })
+			$('dd.meta-machine').bind('onaddClass',    function(e) { $('a', $(this)).addClass('p-ads-dd-blocked'); });
 			$('dd.meta-machine').bind('onremoveClass', function(e) { $('a', $(this)).removeClass('p-ads-dd-blocked');});
 
 			// Return link based on the text of the element we are linking
@@ -373,17 +373,41 @@ var initApplication = function() {
 					$(this).addClass('p-ads-lnk-dsbld');
 			});
 
-			// Function to click all the links below images (block/unblock, hold/unhold) in the current ad row
-			var clickImageActionLinks = function(eventSrc, linkText, toggleLink) {
-				getImageActionLinks(eventSrc, linkText).click();
+			// Watch for attr() calls on ad image wrappers (these indicate an image being blocked or unblocked)
+			// After an attribute change, update disabled status on image (un)block links in sidebar
+			$.hook('attr');
+			$('a.a-adimg').bind('onafterattr', function(e) {
+				var adRow = $(e.target).closest('tr.adRow');
+				var adImages = adRow.find('a.a-adimg');
 
-				$(eventSrc).addClass('p-ads-lnk-dsbld');
-				$(toggleLink).removeClass('p-ads-lnk-dsbld');
+				var   blockLink = adRow.find('a.actn-blckAllImg');
+				var unblockLink = adRow.find('a.actn-ublkAllImg');
+
+				// If all images are blocked, disable block link and enable unblock link
+				if (adImages.filter('.img-block').length == adImages.length) {
+					blockLink.addClass('p-ads-lnk-dsbld');
+					unblockLink.removeClass('p-ads-lnk-dsbld');
+				}
+				// If no images are blocked, enable block link and disable unblock link
+				else if (!adImages.is('.img-block')) {
+					blockLink.removeClass('p-ads-lnk-dsbld');
+					unblockLink.addClass('p-ads-lnk-dsbld');
+				}
+				// Otherwise some images are blocked and some are unblocked, so enable both links
+				else {
+					blockLink.removeClass('p-ads-lnk-dsbld');
+					unblockLink.removeClass('p-ads-lnk-dsbld');
+				}
+			});
+
+			// Function to click all the links below images (block/unblock, hold/unhold) in the current ad row
+			var clickImageActionLinks = function(eventSrc, linkText) {
+				getImageActionLinks(eventSrc, linkText).click();
 			};
 
 			// Set the click event on the block/unblock links to block images
-			$('a.actn-blckAllImg').click(function() { clickImageActionLinks(this,   'block', $(this).next('a.actn-ublkAllImg')); });
-			$('a.actn-ublkAllImg').click(function() { clickImageActionLinks(this, 'unblock', $(this).prev('a.actn-blckAllImg')); });
+			$('a.actn-blckAllImg').click(function() { clickImageActionLinks(this,   'block'); });
+			$('a.actn-ublkAllImg').click(function() { clickImageActionLinks(this, 'unblock'); });
 		};
 
 		// Make the "Next" button at the bottom of the page so actually take you to the next page
