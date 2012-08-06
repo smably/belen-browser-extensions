@@ -27,8 +27,6 @@ var runInPageContext = function(fn) {
 var initApplication = function() {
 
 	// Constants!
-	const FREEMAIL_REGEX         = /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|rocketmail\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i;
-
 	const PATH_MANAGE_ADS        = "/searchAds.do";
 	const PATH_REPLY_TS          = "/replyts/screening.do";
 	const PATH_SPAM_REPORT       = "/spam-report.do";
@@ -38,13 +36,20 @@ var initApplication = function() {
 	const COLOUR_RED_HIGHLIGHT   = "#FCB";
 	const COLOUR_BLUE_BACKGROUND = "#E3EDFA";
 
+	const AD_STATES_BAD          = ["BLOCKED", "BLOCK_ADMIN_CONFIRMED", "DELETED__ADMIN_DELETED"];
+	const AD_STATES_OK           = ["DELAYED", "ACTIVE__TNS_SCORE_FILTER", "ACTIVE__ADMIN_REVIEWED", "ACTIVE__DELAYED_TIMEOUT"];
+
+	const SEARCH_DATERANGE       = "NO_RANGE";
+
 	const JQUERY_WAIT_PERIOD_MS  = "100";
 	const JQUERY_WAIT_TIMEOUT_MS = "1000";
 
 	const FLAG_BOLD              = true;
 	const FLAG_NO_BOLD           = false;
 
-	const LINK_ICON_SRC = "data:image/png;base64," +
+	const FREEMAIL_REGEX         = /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|rocketmail\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i;
+
+	const LINK_ICON_SRC          = "data:image/png;base64," +
 		"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m" +
 		"dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADpSURBVCjPY/jPgB8y0EmBHXdWaeu7ef9rHuaY50jU" + 
 		"3J33v/VdVqkdN1SBEZtP18T/L/7f/X/wf+O96kM3f9z9f+T/xP8+XUZsYAWGfsUfrr6L2Ob9J/X/pP+V" + 
@@ -52,7 +57,7 @@ var initApplication = function() {
 		"BEK3/46/gnZOK0l/r5sJVqCp6Xu99/2qt+v+T/9f+L8CSK77v+pt73vf65qaYAVqzPYGXvdTvmR/z/4Z" +
 		"HhfunP0p+3vKF6/79gZqzPQLSYoUAABKPQ+kpVV/igAAAABJRU5ErkJggg==";
 
-	const MAIL_ICON_SRC = "data:image/png;base64," +
+	const MAIL_ICON_SRC          = "data:image/png;base64," +
 		"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m" +
 		"dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAITSURBVBgZpcHLThNhGIDh9/vn7/RApwc5VCmFWBPi" +
 		"1mvwAlx7BW69Afeu3bozcSE7E02ILjCRhRrds8AEbKVS2gIdSjvTmf+TYqLu+zyiqszDMCf75PnnnVwh" +
@@ -65,7 +70,7 @@ var initApplication = function() {
 		"u2t5KeaNiEkxgAiICDMCCFeEK5aNauAOfoXx8KR9ZOOLk8P7j7er2WBhwWY9sdbDeIJnwBjBWBBAhGsC" +
 		"miZxPD4/7Z98b/0QVWUehjkZ5vQb/Un5e/DIsVsAAAAASUVORK5CYII=";
 
-	const RESET_ICON_SRC = 'data:image/png;base64,' +
+	const RESET_ICON_SRC         = 'data:image/png;base64,' +
 		'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m' +
 		'dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAHsSURBVDjLtZPpTlpRFIV5Dt7AOESr1kYNThGnSomI' +
 		'ihPoNVi5Qp3RgBgvEERpRW1BRBAcMEDUtIkdjKk4otK0Jdr2vgxZ3kA0MYoaG3+cX2evb529zt4sAKz/' +
@@ -118,7 +123,7 @@ var initApplication = function() {
 		}
 	}
 
-	// Do the stuff in Manage Ads..
+	// Do the stuff in Manage Ads...
 	if (location.pathname == PATH_MANAGE_ADS) {
 
 		// Remove the maxLength attribute from the search keyword box
@@ -156,14 +161,37 @@ var initApplication = function() {
 
 				// Find the email address of the user associated with the ad and save it
 				var userEmail = $(this).closest('dl.p-ads-dl').find('dd.meta-email :first-child').text();
-				var params = '';
+
+				// Create search parameters out of the supplied name and value (or values)
+				var buildSearchParams = function(name, values) {
+
+					// Handle some special cases: if there are no values, make values an empty object; if it's a non-object, wrap it in an array
+					if (typeof values == "undefined")
+						values = [];
+					else if (typeof values != "object")
+						values = [values];
+
+					// Build the query string, adding a name=value pair for each value in values
+					var searchParams = "";
+					$.each(values, function() {
+						searchParams += "&" + name + "=" + encodeURIComponent(this);
+					});
+
+					return searchParams;
+				}
 
 				// Set the params if necessary (only for OK/bad ads -- not necessary when we want all ads) and return the complete URL
-				if ($(this).hasClass('meta-usrads-bad'))
-					params = '&searchRequest.groupedAdState=BLOCKED&searchRequest.groupedAdState=BLOCK_ADMIN_CONFIRMED&searchRequest.groupedAdState=DELETED__ADMIN_DELETED';
-				else if ($(this).hasClass('meta-usrads-ok'))
-					params = '&searchRequest.groupedAdState=DELAYED&searchRequest.groupedAdState=ACTIVE__TNS_SCORE_FILTER&searchRequest.groupedAdState=ACTIVE__ADMIN_REVIEWED&searchRequest.groupedAdState=ACTIVE__DELAYED_TIMEOUT';
-				return '?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE' + params + '&idAndEmailField=' + encodeURIComponent(userEmail);
+				var adStates;
+				if ($(this).hasClass('meta-usrads-ok'))
+					adStates = AD_STATES_OK;
+				else if ($(this).hasClass('meta-usrads-bad'))
+					adStates = AD_STATES_BAD;
+
+				var dateParams   = buildSearchParams("searchRequest.dateRangeType",  SEARCH_DATERANGE);
+				var searchParams = buildSearchParams("searchRequest.groupedAdState", adStates);
+				var emailParams  = buildSearchParams("idAndEmailField",              userEmail);
+
+				return '?formAction=submitSearch' + dateParams + searchParams + emailParams;
 			});
 
 			// Add some informative titles on the new links
@@ -190,9 +218,9 @@ var initApplication = function() {
 			}
 
 			// Set link hrefs for all the links we have added
-			adIDLinks.each(function() { $(this).attr('href', generateLinkHref(this, '&idAndEmailField=')); });
+			adIDLinks.each(     function() { $(this).attr('href', generateLinkHref(this, '&idAndEmailField=')); });
 			machineIDLinks.each(function() { $(this).attr('href', generateLinkHref(this, '&machId=')); });
-			phoneLinks.each(function() { $(this).attr('href', generateLinkHref(this, '&searchRequest.keyword=')); });
+			phoneLinks.each(    function() { $(this).attr('href', generateLinkHref(this, '&searchRequest.keyword=')); });
 
 			// Create mail icon from a data: URI and set attributes
 			var mailIcon = $('<img>').attr('src', MAIL_ICON_SRC);
@@ -201,7 +229,7 @@ var initApplication = function() {
 
 			// Wrap the mail icon in a link and add it after each ad ID
 			adIDLinks.each(function() {
-				var repliesURL = '/replyts/screening.do?idmail=' + $(this).text() + '&daterange=NO_RANGE';
+				var repliesURL = '/replyts/screening.do?idmail=' + $(this).text() + '&daterange=' + SEARCH_DATERANGE;
 				var mailLink = $('<a></a>').attr('href', repliesURL).attr('target', '_blank');
 
 				$(this).after(mailIcon.clone().wrap(mailLink).parent());
@@ -246,11 +274,17 @@ var initApplication = function() {
 					// Escape special regex characters!
 					str = str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 
-					// FIXME highlight should just set class "highlight" -- css gets set below
+					// Create a regex from our search string
 					var regex = new RegExp(str, 'gi');
-					var highlight = "<span style='background-color: " + COLOUR_GREEN_HIGHLIGHT + "; font-weight: bold;'>$&</span>";
 
+					// Our highlight string is the regex match wrapped in span with a highlight class
+					var highlight = "<span class='kwd-highlt'>$&</span>";
+
+					// Replace all instances of our search string with the highlight-wrapped version; replace the element text with that
 					el.replaceWith(function() { return $(this).text().replace(regex, highlight); });
+
+					// Set green highlighting on our keyword highlight class
+					$('span.kwd-highlt').css("background-color", COLOUR_GREEN_HIGHLIGHT).css("font-weight", "bold");
 				};
 
 				// Highlight each each search keyword (or "quote delimited" phrase)
@@ -351,8 +385,8 @@ var initApplication = function() {
 		var addBlockImageLinks = function() {
 
 			// Some templates for the block/unblock image links
-			var blockImageDiv = $('<div></div>');
-			var blockImageLink = $('<a></a>').addClass('actn-blckAllImg').text('Block Images').attr('href', '#');
+			var blockImageDiv    = $('<div></div>');
+			var blockImageLink   = $('<a></a>').addClass('actn-blckAllImg').text('Block Images')  .attr('href', '#');
 			var unblockImageLink = $('<a></a>').addClass('actn-ublkAllImg').text('Unblock Images').attr('href', '#');
 
 			// Insert the block/unblock links before the "send ad mail" link in the right sidebar (should be after "block all" link)
@@ -479,7 +513,7 @@ var initApplication = function() {
 						var scoreLines = tooltip.html().split("<br>");
 
 						var regularDiv = $("<div></div>");
-						var hiddenDiv = $("<div></div>").css("color", "#CCC");
+						var hiddenDiv  = $("<div></div>").css("color", "#CCC");
 
 						var tooltipNewHTML = "";
 
@@ -570,7 +604,7 @@ var initApplication = function() {
 		// Set the "ad ID" link to show all replies from that ad, not just the ones from the past day
 		var fixIdLinks = function() {
 
-			$('#rts-tbl td:first-child p:nth-child(2) a:first-child').attr('href', function() { return $(this).attr('href') + "&daterange=NO_RANGE"; });
+			$('#rts-tbl td:first-child p:nth-child(2) a:first-child').attr('href', function() { return $(this).attr('href') + "&daterange=" + SEARCH_DATERANGE; });
 		};
 
 		// Add links to message IDs (note that they will only work with this extension installed)
