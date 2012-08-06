@@ -147,11 +147,10 @@ var initApplication = function() {
 				return unwrapped.wrapInner($('<a></a>').attr('target', '_blank')).find('a');
 			};
 
-			// When the link cursor gets added to the user history line, turn it off
-			$.hook('css');
-			$('dd.meta-user-history').bind('onaftercss', function(e) {
-				$(this).unbind('onaftercss').css('cursor', 'auto');
-			});
+			// Set a CSS rule to override the pointer style that gets added by jquery.belen-tooltip.js
+			var userHistoryStyle = $('<style></style>').attr('type', 'text/css');
+			userHistoryStyle.append(document.createTextNode('dd.meta-user-history { cursor: auto !important; }'));
+			$('body').append(userHistoryStyle);
 
 			// Wrap the text of each of the spans in the user history box in link tags
 			var userHistoryLinks = linkWrap($('span.meta-usrads-pstd,span.meta-usrads-ok,span.meta-usrads-bad'));
