@@ -157,7 +157,9 @@ var initApplication = function() {
 			var userHistoryLinks = linkWrap($('span.meta-usrads-pstd,span.meta-usrads-ok,span.meta-usrads-bad'));
 
 			// Apply the span class to child link tags to preserve link colour
-			userHistoryLinks.addClass(function() { return $(this).parent().attr('class'); });
+			userHistoryLinks.addClass(function() {
+				return $(this).parent().attr('class');
+			});
 
 			// Add the link href attributes according to the class of the element and the text in the email field
 			userHistoryLinks.attr('href', function() {
@@ -217,7 +219,12 @@ var initApplication = function() {
 
 			// Return link based on the text of the element we are linking
 			var generateLinkHref = function(el, queryString) {
-				return '?formAction=submitSearch&searchRequest.dateRangeType=LAST_MONTH' + queryString + encodeURIComponent($(el).text());
+
+				var linkHref = '?formAction=submitSearch';
+				linkHref += '&searchRequest.dateRangeType=LAST_MONTH';
+				linkHref += queryString + encodeURIComponent($(el).text());
+
+				return linkHref;
 			}
 
 			// Set link hrefs for all the links we have added
@@ -244,22 +251,38 @@ var initApplication = function() {
 
 			// Find all adRow tr elements that have a child element of class "meta-usrads-pstd" in which the text is precisely "1"
 			// To those matching tr elements, apply a blue background colour (these are our first-time posters)
-			$('tr.adRow').has($('span.meta-usrads-pstd').filter(function() { return $(this).text() == '1'; })).css('background-color', COLOUR_BLUE_BACKGROUND);
+			$('tr.adRow').has($('span.meta-usrads-pstd').filter(function() {
+				return $(this).text() == '1';
+			})).css('background-color', COLOUR_BLUE_BACKGROUND);
 
 			// Highlight all scores >0
-			SET_HIGHLIGHT($('dd.meta-scr').filter(function() { return $(this).text().trim() != '0'; }), COLOUR_RED_HIGHLIGHT);
+			SET_HIGHLIGHT($('dd.meta-scr').filter(function() {
+				return $(this).text().trim() != '0';
+			}), COLOUR_RED_HIGHLIGHT);
 
 			// Highlight, live (untested), blocked, and deleted ad status in red
-			SET_HIGHLIGHT($('dd.meta-status:contains("Live \(Untested\)"),dd.meta-status:contains("Blocked"),dd.meta-status:contains("Deleted \(Admin\)")'), COLOUR_RED_HIGHLIGHT);
+			SET_HIGHLIGHT($('dd.meta-status:contains("Live \(Untested\)")'), COLOUR_RED_HIGHLIGHT);
+			SET_HIGHLIGHT($('dd.meta-status:contains("Blocked")'), COLOUR_RED_HIGHLIGHT);
+			SET_HIGHLIGHT($('dd.meta-status:contains("Deleted \(Admin\)")'), COLOUR_RED_HIGHLIGHT);
 
 			// Highlight freemail domains
-			SET_HIGHLIGHT($('dd.meta-email :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }), COLOUR_RED_HIGHLIGHT);
+			SET_HIGHLIGHT($('dd.meta-email :first-child').filter(function() {
+				return FREEMAIL_REGEX.test($(this).text());
+			}), COLOUR_RED_HIGHLIGHT);
 
 			// Highlight users with at least one bad ad (blocked or admin deleted)
-			SET_HIGHLIGHT($('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() { return $(this).text() != '0'; })), COLOUR_RED_HIGHLIGHT);
+			SET_HIGHLIGHT($('dd.meta-user-history').has($('span.meta-usrads-bad').filter(function() {
+				return $(this).text() != '0';
+			})), COLOUR_RED_HIGHLIGHT);
 
 			// Highlight users with at least one note
-			SET_HIGHLIGHT($('a.actn-ntpd').filter(function() { return $(this).next('span').text() != '0' || $(this).next('span').next('span').text() != '0'; }), COLOUR_RED_HIGHLIGHT);
+			SET_HIGHLIGHT($('a.actn-ntpd').filter(function() {
+
+				var hasNoteOnAd = ($(this).next('span').text() != '0');
+				var hasNoteOnAccount = ($(this).next('span').next('span').text() != '0');
+
+				return hasNoteOnAd || hasNoteOnAccount;
+			}), COLOUR_RED_HIGHLIGHT);
 		};
 
 		// Highlight keyword search terms
@@ -284,7 +307,9 @@ var initApplication = function() {
 					var highlight = "<span class='kwd-highlt'>$&</span>";
 
 					// Replace all instances of our search string with the highlight-wrapped version; replace the element text with that
-					el.replaceWith(function() { return $(this).text().replace(regex, highlight); });
+					el.replaceWith(function() {
+						return $(this).text().replace(regex, highlight);
+					});
 
 					// Set green highlighting on our keyword highlight class
 					$('span.kwd-highlt').css("background-color", COLOUR_GREEN_HIGHLIGHT).css("font-weight", "bold");
@@ -294,12 +319,13 @@ var initApplication = function() {
 				$.each(keywords, function(i, keyword) {
 
 					// The text eligible for highlighting is  all text nodes within the ad title and descrption elements
-					var titleAndDescriptionText = $('h2.p-ads-hdln-title,p.meta-description').contents().filter(function() { return this.nodeType == 3; });
+					var titleAndDescriptionText = $('h2.p-ads-hdln-title,p.meta-description').contents().filter(function() {
+						return this.nodeType == Node.TEXT_NODE;
+					});
 
 					// If there are any elements that can be highlighted, highlight them with the keyword (stripping it of quotation marks if necessary)
-					if (titleAndDescriptionText.length > 0) {
+					if (titleAndDescriptionText.length > 0)
 						hl(titleAndDescriptionText, keyword.toString().replace(/"/g, ''));
-					}
 				});
 
 				// Set some highlighting on the search terms
@@ -607,19 +633,27 @@ var initApplication = function() {
 		// Set the "ad ID" link to show all replies from that ad, not just the ones from the past day
 		var fixIdLinks = function() {
 
-			$('#rts-tbl td:first-child p:nth-child(2) a:first-child').attr('href', function() { return $(this).attr('href') + "&daterange=" + SEARCH_DATERANGE; });
+			$('#rts-tbl td:first-child p:nth-child(2) a:first-child').attr('href', function() {
+				return $(this).attr('href') + "&daterange=" + SEARCH_DATERANGE;
+			});
 		};
 
 		// Add links to message IDs (note that they will only work with this extension installed)
 		var linkifyReplies = function() {
 
-			$('#rts-tbl td:first-child p:nth-child(2)').contents().filter(function() { return $(this).text().trim().match(/^Message ID: \d+$/); }).replaceWith(function() { var m = $(this).text().match(/\d+/)[0]; return 'Message ID: <a href=\'?srch-jumptomessage-id=' + m + '\' target=\'_blank\'>' + m + '</a>'; });
+			$('#rts-tbl td:first-child p:nth-child(2)').contents().filter(function() {
+				return $(this).text().trim().match(/^Message ID: \d+$/); }).replaceWith(function() {
+					var m = $(this).text().match(/\d+/)[0];
+					return 'Message ID: <a href=\'?srch-jumptomessage-id=' + m + '\' target=\'_blank\'>' + m + '</a>';
+				});
 		};
 
 		// Highlight the bad stuff in replies
 		var hlReplyRisks = function() {
 
-			SET_HIGHLIGHT($('span.j-block-status :first-child').filter(function() { return FREEMAIL_REGEX.test( $(this).text() ); }), COLOUR_RED_HIGHLIGHT);
+			SET_HIGHLIGHT($('span.j-block-status :first-child').filter(function() {
+				return FREEMAIL_REGEX.test( $(this).text() );
+			}), COLOUR_RED_HIGHLIGHT);
 		};
 
 		// Hide Gumtree boilerplate in replies
@@ -629,11 +663,15 @@ var initApplication = function() {
 			var boilerplateStartRegex = new RegExp('(.|\n)+?Message:');
 			var boilerplateEndRegex = new RegExp('<br>(Please report any suspicious email|If your ad is no longer available)(.|\n)+');
 
-			var repliesWithBoilerplate = $('div.rts-mail-body').filter(function() { return ($(this).text().trim().indexOf('Someone has replied to your ad!') == 0); });
+			var repliesWithBoilerplate = $('div.rts-mail-body').filter(function() {
+				return ($(this).text().trim().indexOf('Someone has replied to your ad!') == 0);
+			});
 
 			// Make a little function to replace a bunch of text with an inconspicuous ellipsis
 			var collapse = function(el, regex) {
-				el.innerHTML = el.innerHTML.replace(regex, function(matched) {return "<span style='color: #AAA;'>[ ... ]</span>";});
+				el.innerHTML = el.innerHTML.replace(regex, function(matched) {
+					return "<span style='color: #AAA;'>[ ... ]</span>";
+				});
 			}
 
 			repliesWithBoilerplate.each(function() {
@@ -668,9 +706,15 @@ var initApplication = function() {
 		// Add links to message IDs, ad IDs, and IPs in the spam report
 		var linkifySpamReport = function() {
 			// Wrap message IDs and ad IDs in links
-			$('tr.record td:nth-child(3)').wrapInner(function() { return "<a href='" + PATH_REPLY_TS + "?srch-jumptomessage-id=" + $(this).text() + "' target='_blank'>"; });
-			$('tr.record td:nth-child(4)').wrapInner(function() { return "<a href='" + PATH_MANAGE_ADS + "?formAction=submitSearch&idAndEmailField=" + $(this).text() + "' target='_blank'>"; });
-			$('tr.record td:nth-child(7)').wrapInner(function() { return "<a href='" + PATH_REPLY_TS + "?ip=" + $(this).text() + "&daterange=LAST_DAY' target='_blank'>"; });
+			$('tr.record td:nth-child(3)').wrapInner(function() {
+				return "<a href='" + PATH_REPLY_TS + "?srch-jumptomessage-id=" + $(this).text() + "' target='_blank'>";
+			});
+			$('tr.record td:nth-child(4)').wrapInner(function() {
+				return "<a href='" + PATH_MANAGE_ADS + "?formAction=submitSearch&idAndEmailField=" + $(this).text() + "' target='_blank'>";
+			});
+			$('tr.record td:nth-child(7)').wrapInner(function() {
+				return "<a href='" + PATH_REPLY_TS + "?ip=" + $(this).text() + "&daterange=LAST_DAY' target='_blank'>";
+			});
 		}
 
 		// No jQuery by default, so add it in and pass our linkify function in as a callback
