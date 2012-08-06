@@ -147,8 +147,11 @@ var initApplication = function() {
 				return unwrapped.wrapInner($('<a></a>').attr('target', '_blank')).find('a');
 			};
 
-			// When mousing over the history line, make sure the link cursor is off (it gets added after this script is run, so we can't just set it here)
-			$('dd.meta-user-history').bind('mouseover', function(event) { $(this).css('cursor', 'auto') });
+			// When the link cursor gets added to the user history line, turn it off
+			$.hook('css');
+			$('dd.meta-user-history').bind('onaftercss', function(e) {
+				$(this).unbind('onaftercss').css('cursor', 'auto');
+			});
 
 			// Wrap the text of each of the spans in the user history box in link tags
 			var userHistoryLinks = linkWrap($('span.meta-usrads-pstd,span.meta-usrads-ok,span.meta-usrads-bad'));
@@ -209,8 +212,8 @@ var initApplication = function() {
 
 			// Make sure the ad ID link gets the blocked class whenever its parent dd gets set to blocked
 			$.hook(['addClass', 'removeClass']);
-			$('dd.meta-machine').bind('onaddClass',    function(e) { $('a', $(this)).addClass('p-ads-dd-blocked'); });
-			$('dd.meta-machine').bind('onremoveClass', function(e) { $('a', $(this)).removeClass('p-ads-dd-blocked');});
+			$('dd.meta-machine').bind('onaddClass',    function(e) { $(this).find('a').addClass('p-ads-dd-blocked'); });
+			$('dd.meta-machine').bind('onremoveClass', function(e) { $(this).find('a').removeClass('p-ads-dd-blocked'); });
 
 			// Return link based on the text of the element we are linking
 			var generateLinkHref = function(el, queryString) {
@@ -416,7 +419,7 @@ var initApplication = function() {
 			// After an attribute change, update disabled status on image (un)block links in sidebar
 			$.hook('attr');
 			$('a.a-adimg').bind('onafterattr', function(e) {
-				var adRow = $(e.target).closest('tr.adRow');
+				var adRow = $(this).closest('tr.adRow');
 				var adImages = adRow.find('a.a-adimg');
 
 				var   blockLink = adRow.find('a.actn-blckAllImg');
