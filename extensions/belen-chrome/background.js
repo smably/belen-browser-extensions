@@ -49,6 +49,9 @@ var initApplication = function() {
 
 	const FREEMAIL_REGEX         = /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|rocketmail\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i;
 
+	const REPLY_BEGIN_REGEX = /(.|\n)+?Message:/;
+	const REPLY_END_REGEX = /<br>\s*(To reply to this message please use the Reply Button|Please report any suspicious email|If your ad is no longer available)(.|\n)+/;
+
 	const LINK_ICON_SRC          = "data:image/png;base64," +
 		"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m" +
 		"dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADpSURBVCjPY/jPgB8y0EmBHXdWaeu7ef9rHuaY50jU" + 
@@ -658,24 +661,21 @@ var initApplication = function() {
 		// Hide Gumtree boilerplate in replies
 		var hideBoilerplate = function() {
 
-			// Text at the bottom varies depending on whether or not the user is registered
-			var boilerplateStartRegex = new RegExp('(.|\n)+?Message:');
-			var boilerplateEndRegex = new RegExp('<br>(Please report any suspicious email|If your ad is no longer available)(.|\n)+');
-
 			var repliesWithBoilerplate = $('div.rts-mail-body').filter(function() {
 				return ($(this).text().trim().indexOf('Someone has replied to your ad!') == 0);
 			});
 
 			// Make a little function to replace a bunch of text with an inconspicuous ellipsis
 			var collapse = function(el, regex) {
+
 				el.innerHTML = el.innerHTML.replace(regex, function(matched) {
 					return "<span style='color: #AAA;'>[ ... ]</span>";
 				});
 			}
 
 			repliesWithBoilerplate.each(function() {
-				collapse(this, boilerplateStartRegex);
-				collapse(this, boilerplateEndRegex);
+				collapse(this, REPLY_BEGIN_REGEX);
+				collapse(this, REPLY_END_REGEX);
 			});
 		};
 
