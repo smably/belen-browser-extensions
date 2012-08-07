@@ -20,7 +20,7 @@ var jQuery, $, Belen;
 var runInPageContext = function(fn) {
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
-	script.appendChild(document.createTextNode('('+ fn +')();'));
+	script.textContent = '('+ fn +')();';
 	document.body.appendChild(script);
 }
 
@@ -49,8 +49,8 @@ var initApplication = function() {
 
 	const FREEMAIL_REGEX         = /@(aol\.|gmx\.|g?(oogle)?mail\.com|hotmail\.|msn\.com|naver\.com|qq\.com|rocketmail\.com|(windows)?live\.|y7?mail\.com|yahoo\.)/i;
 
-	const REPLY_BEGIN_REGEX = /(.|\n)+?Message:/;
-	const REPLY_END_REGEX = /<br>\s*(To reply to this message please use the Reply Button|Please report any suspicious email|If your ad is no longer available)(.|\n)+/;
+	const REPLY_BEGIN_REGEX      = /(.|\n)+?Message:/;
+	const REPLY_END_REGEX        = /<br>\s*(To reply to this message please use the Reply Button|Please report any suspicious email|If your ad is no longer available)(.|\n)+/;
 
 	const LINK_ICON_SRC          = "data:image/png;base64," +
 		"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m" +
@@ -151,9 +151,10 @@ var initApplication = function() {
 			};
 
 			// Set a CSS rule to override the pointer style that gets added by jquery.belen-tooltip.js
-			var userHistoryStyle = $('<style></style>').attr('type', 'text/css');
-			userHistoryStyle.append(document.createTextNode('dd.meta-user-history { cursor: auto !important; }'));
-			$('body').append(userHistoryStyle);
+			var userHistoryStyle = document.createElement('style');
+			userHistoryStyle.type = 'text/css';
+			userHistoryStyle.textContent = 'dd.meta-user-history { cursor: auto !important; }';
+			document.body.appendChild(userHistoryStyle);
 
 			// Wrap the text of each of the spans in the user history box in link tags
 			var userHistoryLinks = linkWrap($('span.meta-usrads-pstd,span.meta-usrads-ok,span.meta-usrads-bad'));
@@ -264,7 +265,7 @@ var initApplication = function() {
 
 			// Highlight, live (untested), blocked, and deleted ad status in red
 			SET_HIGHLIGHT($('dd.meta-status:contains("Live \(Untested\)")'), COLOUR_RED_HIGHLIGHT);
-			SET_HIGHLIGHT($('dd.meta-status:contains("Blocked")'), COLOUR_RED_HIGHLIGHT);
+			SET_HIGHLIGHT($('dd.meta-status:contains("Blocked")'),           COLOUR_RED_HIGHLIGHT);
 			SET_HIGHLIGHT($('dd.meta-status:contains("Deleted \(Admin\)")'), COLOUR_RED_HIGHLIGHT);
 
 			// Highlight freemail domains
