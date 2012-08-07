@@ -2,6 +2,7 @@ const PageMod = require("page-mod").PageMod;
 const self = require("self");
 
 const SCRIPT_BELEN = 'Belen.user.js';
+const SCRIPT_JQUERY_HOOK = 'jquery.hook.js';
 const SCRIPT_REPLY_JUMP = 'replyts_jumptomessage.js';
 
 const PATH_MANAGE_ADS = "http://cs.gumtree.com.au/searchAds.do";
@@ -25,7 +26,10 @@ exports.main = function() {
             PATH_MANAGE_ADS + "*",
             PATH_REPLY_TS + "*"
         ],
-        contentScriptFile: self.data.url(SCRIPT_BELEN),
+        contentScriptFile: [
+            self.data.url(SCRIPT_JQUERY_HOOK),
+            self.data.url(SCRIPT_BELEN)
+        ],
         contentScriptWhen: "end"
     });
 };
