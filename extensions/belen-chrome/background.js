@@ -267,6 +267,8 @@ var initApplication = function() {
 			SET_HIGHLIGHT($('dd.meta-status:contains("Live \(Untested\)")'), COLOUR_RED_HIGHLIGHT);
 			SET_HIGHLIGHT($('dd.meta-status:contains("Blocked")'),           COLOUR_RED_HIGHLIGHT);
 			SET_HIGHLIGHT($('dd.meta-status:contains("Deleted \(Admin\)")'), COLOUR_RED_HIGHLIGHT);
+			// Highlight partner trusted status in green
+			SET_HIGHLIGHT($('dd.meta-status:contains("Partner Trusted")'),   COLOUR_GREEN_HIGHLIGHT);
 
 			// Highlight freemail domains
 			SET_HIGHLIGHT($('dd.meta-email :first-child').filter(function() {
