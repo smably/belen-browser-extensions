@@ -22,7 +22,7 @@ var runInPageContext = function(fn) {
 	script.type = 'text/javascript';
 	script.textContent = '('+ fn +')();';
 	document.body.appendChild(script);
-}
+};
 
 var initApplication = function() {
 
@@ -522,11 +522,11 @@ var initApplication = function() {
 			// No more result pages; disable the next button
 			else {
 				var nextButton = $('#ads-pager a.next');
-				nextButton.unbind('click').click(function(e){ e.preventDefault(); });
+				nextButton.unbind('click').click(function(e) { e.preventDefault(); });
 				nextButton.css("cursor", "default").css("opacity", "0.7");
 				nextButton.attr("title", "No more pages");
 			}
-		}
+		};
 
 		// Adds some visual cues to the scoring summary tooltip:
 		// Positive (bad) scores are highlighted in red; negative (good) scores are highlighted in green
@@ -609,7 +609,7 @@ var initApplication = function() {
 		var addAdSeparators = function() {
 			$("tr.adRow").css("border-bottom", "#888 4px solid");
 			$("tr.adRow > td").css("padding", "15px 5px");
-		}
+		};
 
 		// Fix things in the header and search box
 		createPermalink();
