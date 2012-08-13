@@ -612,22 +612,30 @@ var initApplication = function() {
 		};
 
 		// Unbind the event handler, run the handler, and rebind it when we're done
-		// Avoids infinite recursion with functions that create the same event they're handling
-		// Optional arguments can be passed in after the event arg and will be applied to the handler fn
+		// Avoids infinite recursion with functions that generate the same event they're handling
+		// Optional arguments can be passed in after the event arg and will be supplied to the handler function
 		var runUnbound = function(handler, evt) {
 
-			var args = Array.prototype.slice.call(arguments);
-
+			// Unbind the existing event handler from the event's target element
 			$(evt.target).unbind(evt.type);
-			handler.apply(this, args.slice(1));
-			$(evt.target).bind(evt.type, function() { runUnbound.apply(this, args); });
+
+			// We need to remove the first argument from our argument list, because it is the function we are passing arguments to
+			// Array.prototype.slice is the array slice function, which "arguments" doesn't have because it's not a first-class array
+			// We call the slice function from the array prototype, passing in the argument list as the first parameter
+			// That parameter is used as "this" inside the function, so it is as if we'd called arguments.slice(1)
+			// TL;DR: call our supplied handler function using apply, passing in any arguments as an array
+			handler.apply(this, Array.prototype.slice.call(arguments, 1));
+
+			// Re-bind the event handler to the event target
+			// The event handler is presumably a reference to this function, or something that calls it
+			$(evt.target).bind(evt.type, evt.handler);
 		};
 
 		// Do various things on each row of ads as they are loaded
 		var fixAdRow = function(evt) {
 
-			// Sanity check to make sure that we are handling a setData event
-			if (evt.type == "setData") {
+			// Sanity check to make sure that we are handling a setData event with a key/value pair as arguments
+			if (evt.type == "setData" && arguments.length >= 3) {
 
 				// setData events come with a couple of other arguments for key and value being set
 				// Stuff those into adRowData
@@ -643,15 +651,15 @@ var initApplication = function() {
 					if (deleteBox.data("events") != null && typeof deleteBox.data("events").change != "undefined") {
 
 						// Save the change handler function in a variable, and also in a data attribute for later use
-						var changeHandler = deleteBox.data("events").change[0].handler;
-						deleteBox.data("oldChangeHandler", changeHandler);
+						var oldChangeHandler = deleteBox.data("events").change[0].handler;
+						deleteBox.data("oldChangeHandler", oldChangeHandler);
 
 						// Get rid of the old change handler and define our own with a prompt
 						deleteBox.unbind('change').change(function() {
-							if (confirm("Deleting for reason " + deleteBox.find("option:selected").text() + ".\n\nAre you sure?")) {
+							if (confirm("Deleting for reason " + deleteBox.find("option:selected").text() + ".\n\nContinue?")) {
 
 								// Run the original handler function attached to the delete box
-								changeHandler();
+								oldChangeHandler();
 							}
 							else {
 
