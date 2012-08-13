@@ -611,6 +611,28 @@ var initApplication = function() {
 			$("tr.adRow > td").css("padding", "15px 5px");
 		};
 
+		// Add a selectbox to delete all selected ads for the same reason
+		// TODO document this function
+		var addBatchDeleteBox = function() {
+			var batchDeleteBox = $('select.actn-dlt').first().clone();
+			batchDeleteBox.unbind("change").removeAttr("disabled");
+			batchDeleteBox.find("option").first().text("Delete selected ads...");
+
+			batchDeleteBox.bind("change", function() {
+				var deleteBoxes = $('input.chck-blk:checked').closest('tr.adRow').find('select.actn-dlt');
+				deleteBoxes = deleteBoxes.filter(function() { return !$(this).attr("disabled"); });
+				if (confirm("Deleting " + deleteBoxes.length + " ads for reason " + batchDeleteBox.find("option:selected").text() + ".\n\nContinue?")) {
+					deleteBoxes.each(function() {
+						$(this).val(batchDeleteBox.val());
+						$(this).data("oldChangeHandler").call(this);
+					});
+				}
+				batchDeleteBox.val("1").blur();
+			});
+
+			$('#blkactn-udlt').after(batchDeleteBox);
+		};
+
 		// Unbind the event handler, run the handler, and rebind it when we're done
 		// Avoids infinite recursion with functions that generate the same event they're handling
 		// Optional arguments can be passed in after the event arg and will be supplied to the handler function
@@ -659,7 +681,7 @@ var initApplication = function() {
 							if (confirm("Deleting for reason " + deleteBox.find("option:selected").text() + ".\n\nContinue?")) {
 
 								// Run the original handler function attached to the delete box
-								oldChangeHandler();
+								oldChangeHandler.call(deleteBox);
 							}
 							else {
 
@@ -698,6 +720,7 @@ var initApplication = function() {
 		highlightScoringSummary();
 
 		// Fix things in the footer
+		addBatchDeleteBox();
 		fixNextButton();
 
 		// Set up event hooks
