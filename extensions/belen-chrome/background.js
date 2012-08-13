@@ -611,47 +611,65 @@ var initApplication = function() {
 			$("tr.adRow > td").css("padding", "15px 5px");
 		};
 
-		// Unbind event evt from element el; run function fn, passing in the array of arguments in args; then rebind runUnhooked afterwards
-		// Avoids infinite recursion with functions that call the same jQuery method we've hooked
-		var runUnhooked = function(el, evt, fn, args) {
-			$(el).unbind(evt);
-			fn.apply(el, args);
-			$(el).bind(evt, function() { runUnhooked(el, evt, fn, args); });
+		// Unbind the event handler, run the handler, and rebind it when we're done
+		// Avoids infinite recursion with functions that create the same event they're handling
+		// Optional arguments can be passed in after the event arg and will be applied to the handler fn
+		var runUnbound = function(handler, evt) {
+
+			var args = Array.prototype.slice.call(arguments);
+
+			$(evt.target).unbind(evt.type);
+			handler.apply(this, args.slice(1));
+			$(evt.target).bind(evt.type, function() { runUnbound.apply(this, args); });
 		};
 
 		// Do various things on each row of ads as they are loaded
-		var fixAdRow = function(el) {
-			if ($(el).data('loaded') && !$(el).data('fixed')) {
+		var fixAdRow = function(evt) {
 
-				var deleteBox = $(el).find('select.actn-dlt');
-				if (deleteBox.data("events") != null && typeof deleteBox.data("events").change != "undefined") {
+			// Sanity check to make sure that we are handling a setData event
+			if (evt.type == "setData") {
 
-					// TODO do a .each() to get all the change handlers and systematically add them all back
-					var changeHandler = deleteBox.data("events").change[0].handler;
-					deleteBox.unbind('change').change(function() {
+				// setData events come with a couple of other arguments for key and value being set
+				// Stuff those into adRowData
+				var adRow = evt.target;
+				var adRowData = {};
+				adRowData[arguments[1]] = arguments[2];
 
-						if (confirm("Deleting for reason " + deleteBox.find("option:selected").text() + ".\n\nAre you sure?")) {
-							// Save the original change handler function as data attached to the delete box, then run it
-							deleteBox.data("oldChangeHandler", changeHandler);
-							changeHandler();
-						}
-						else {
-							// Reset and deselect the deletion reason box
-							deleteBox.val("1").blur();
-						}
-					});
+				// If we're running this because the ad row finished loading, but the adRow isn't fixed yet, we can do our thing
+				if (adRowData['loaded'] && !$(adRow).data('fixed')) {
+
+					// Find our deletion reason selectbox and make sure it has a change event set already
+					var deleteBox = $(adRow).find('select.actn-dlt');
+					if (deleteBox.data("events") != null && typeof deleteBox.data("events").change != "undefined") {
+
+						// Save the change handler function in a variable, and also in a data attribute for later use
+						var changeHandler = deleteBox.data("events").change[0].handler;
+						deleteBox.data("oldChangeHandler", changeHandler);
+
+						// Get rid of the old change handler and define our own with a prompt
+						deleteBox.unbind('change').change(function() {
+							if (confirm("Deleting for reason " + deleteBox.find("option:selected").text() + ".\n\nAre you sure?")) {
+
+								// Run the original handler function attached to the delete box
+								changeHandler();
+							}
+							else {
+
+								// Reset and deselect the deletion reason box
+								deleteBox.val("1").blur();
+							}
+						});
+
+						// Mark the adRow as fixed so it will not be changed again
+						$(adRow).data('fixed', true);
+					}
 				}
-
-				$(el).data('fixed', true);
 			}
 		};
 
-		// Set up hooks and hook handlers
-		var initHooks = function() {
-			$.hook("data");
-			$('tr.adRow').bind('onafterdata', function(e) {
-				runUnhooked(this, 'onafterdata', function(e) { fixAdRow(e); }, [this]);
-			});
+		// Bind event handlers to events
+		var initEventBindings = function() {
+			$('tr.adRow').bind('setData', function(e, key, val) { runUnbound(fixAdRow, e, key, val); });
 		};
 
 		// Fix things in the header and search box
@@ -675,7 +693,7 @@ var initApplication = function() {
 		fixNextButton();
 
 		// Set up event hooks
-		initHooks();
+		initEventBindings();
 	}
 
 	// Do the stuff in ReplyTS

@@ -17,7 +17,7 @@
 		{
 			"js": [ "jquery.hook.js", "background.js" ],
 			"matches": [ "http://cs.gumtree.com.au/*" ],
-			"run_at": "document_idle"
+			"run_at": "document_end"
 		}
 	]
 }
