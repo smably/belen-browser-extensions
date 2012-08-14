@@ -218,10 +218,17 @@ var initApplication = function() {
 			// Restore red highlighting on blocked machine IDs
 			machineIDLinks.filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
 
-			// Make sure the ad ID link gets the blocked class whenever its parent dd gets set to blocked
 			$.hook(['addClass', 'removeClass']);
-			$('dd.meta-machine').bind('onaddClass',    function() { $(this).find('a').addClass('p-ads-dd-blocked'); });
-			$('dd.meta-machine').bind('onremoveClass', function() { $(this).find('a').removeClass('p-ads-dd-blocked'); });
+
+			// Make sure the machine ID link gets the blocked class whenever its parent dd gets it
+			$('dd.meta-machine').bind('onafteraddClass', function() {
+				$('dd.meta-machine.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
+			});
+
+			// Make sure the machine ID link loses the blocked class whenever its parent dd loses it
+			$('dd.meta-machine').bind('onafterremoveClass', function() {
+				$('dd.meta-machine').not($('dd.p-ads-dd-blocked')).find('a').removeClass('p-ads-dd-blocked');
+			});
 
 			// Return link based on the text of the element we are linking
 			var generateLinkHref = function(el, queryString) {
