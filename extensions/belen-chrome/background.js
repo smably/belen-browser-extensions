@@ -53,7 +53,7 @@ var initApplication = function() {
 	const REPLY_END_REGEX        = /<br>\s*(To reply to this message please use the Reply Button|Please report any suspicious email|If your ad is no longer available)(.|\n)+/;
 
 	const TOOLTIP_SELECT_ALL     = "Click to select all";
-	const TOOLTIP_SELECT_NONE    = "Click to select none";
+	const TOOLTIP_SELECT_NONE    = "Click to deselect all";
 
 	const LINK_ICON_SRC          = "data:image/png;base64," +
 		"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m" +
