@@ -52,6 +52,9 @@ var initApplication = function() {
 	const REPLY_BEGIN_REGEX      = /(.|\n)+?Message:/;
 	const REPLY_END_REGEX        = /<br>\s*(To reply to this message please use the Reply Button|Please report any suspicious email|If your ad is no longer available)(.|\n)+/;
 
+	const TOOLTIP_SELECT_ALL     = "Click to select all";
+	const TOOLTIP_SELECT_NONE    = "Click to select none";
+
 	const LINK_ICON_SRC          = "data:image/png;base64," +
 		"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m" +
 		"dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADpSURBVCjPY/jPgB8y0EmBHXdWaeu7ef9rHuaY50jU" + 
@@ -217,8 +220,8 @@ var initApplication = function() {
 
 			// Make sure the ad ID link gets the blocked class whenever its parent dd gets set to blocked
 			$.hook(['addClass', 'removeClass']);
-			$('dd.meta-machine').bind('onaddClass',    function(e) { $(this).find('a').addClass('p-ads-dd-blocked'); });
-			$('dd.meta-machine').bind('onremoveClass', function(e) { $(this).find('a').removeClass('p-ads-dd-blocked'); });
+			$('dd.meta-machine').bind('onaddClass',    function() { $(this).find('a').addClass('p-ads-dd-blocked'); });
+			$('dd.meta-machine').bind('onremoveClass', function() { $(this).find('a').removeClass('p-ads-dd-blocked'); });
 
 			// Return link based on the text of the element we are linking
 			var generateLinkHref = function(el, queryString) {
@@ -449,7 +452,7 @@ var initApplication = function() {
 			// Watch for attr() calls on ad image wrappers (these indicate an image being blocked or unblocked)
 			// After an attribute change, update disabled status on image (un)block links in sidebar
 			$.hook('attr');
-			$('a.a-adimg').bind('onafterattr', function(e) {
+			$('a.a-adimg').bind('onafterattr', function() {
 				var adRow = $(this).closest('tr.adRow');
 				var adImages = adRow.find('a.a-adimg');
 
@@ -621,11 +624,25 @@ var initApplication = function() {
 			batchDeleteBox.bind("change", function() {
 				var deleteBoxes = $('input.chck-blk:checked').closest('tr.adRow').find('select.actn-dlt');
 				deleteBoxes = deleteBoxes.filter(function() { return !$(this).attr("disabled"); });
-				if (confirm("Deleting " + deleteBoxes.length + " ads for reason " + batchDeleteBox.find("option:selected").text() + ".\n\nContinue?")) {
+				var numAds = deleteBoxes.length;
+
+				var confirmDeletion = function() {
+					var s = ((numAds > 1) ? "s" : "");
+					var deletionReason = $(this).find("option:selected").text();
+
+					var msg = "Deleting " + numAds + " ad" + s + " for reason " + deletionReason + ".\n\n" +
+						"Continue?";
+					return confirm(msg);
+				};
+
+				if (numAds > 0 && confirmDeletion.call(this)) {
 					deleteBoxes.each(function() {
 						$(this).val(batchDeleteBox.val());
 						$(this).data("oldChangeHandler").call(this);
 					});
+				}
+				else if (numAds == 0) {
+					alert("Please select one or more active ads to delete.");
 				}
 				batchDeleteBox.val("1").blur();
 			});
@@ -633,20 +650,17 @@ var initApplication = function() {
 			$('#blkactn-udlt').after(batchDeleteBox);
 		};
 
+		// Adds a select all/none checkbox to right side of the footer
 		var addBatchSelectBox = function() {
-			var batchSelectBox = $("<input>").attr("type", "checkbox").attr("title", "Select all");
+			var batchSelectBox = $("<input>").attr("type", "checkbox").attr("title", TOOLTIP_SELECT_ALL);
 			batchSelectBox.css("vertical-align", "middle").css("margin", "0 5px 3px 15px");
 
 			// FIXME who knows why this is necessary?
 			batchSelectBox.bind("click", function(e) { e.stopPropagation(); });
 
 			batchSelectBox.bind("change", function() {
-				var checked = $(this).attr("checked");
-				$('input.chck-blk').attr("checked", checked).trigger("change");
-				if (checked)
-					$(this).attr("title", "Select none");
-				else
-					$(this).attr("title", "Select all");
+				$('input.chck-blk').attr("checked", $(this).attr("checked")).trigger("change");
+				$(this).attr("title", ($(this).attr("checked") ? TOOLTIP_SELECT_NONE : TOOLTIP_SELECT_ALL));
 			});
 
 			$('#blkactn-udlt').after(batchSelectBox);
@@ -723,18 +737,15 @@ var initApplication = function() {
 			$('tr.adRow').bind('setData', function(e, key, val) { runUnbound(fixAdRow, e, key, val); });
 
 			// Allow ad checkboxes to be selected by clicking the enclosing td
-			$('td.p-ads-td-blk').bind('click', function(e) {
+			$('td.p-ads-td-blk').bind('click', function() {
 				var checkbox = $(this).find('input.chck-blk');
 				checkbox.attr('checked', !checkbox.attr('checked')).trigger('change');
 			});
 
 			// Highlight the enclosing td when an ad checkbox changes state
 			$('input.chck-blk').bind('click', function(e) { e.stopPropagation(); });
-			$('input.chck-blk').bind('change', function(e) {
-				if ($(this).attr('checked'))
-					$(this).parent().css('background-color', '#CCC');
-				else
-					$(this).parent().css('background-color', '#FFF');
+			$('input.chck-blk').bind('change', function() {
+				$(this).parent().css('background-color', ($(this).attr('checked') ? '#CCC' : '#FFF'));
 			});
 		};
 
