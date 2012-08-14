@@ -633,6 +633,25 @@ var initApplication = function() {
 			$('#blkactn-udlt').after(batchDeleteBox);
 		};
 
+		var addBatchSelectBox = function() {
+			var batchSelectBox = $("<input>").attr("type", "checkbox").attr("title", "Select all");
+			batchSelectBox.css("vertical-align", "middle").css("margin", "0 5px 3px 15px");
+
+			// FIXME who knows why this is necessary?
+			batchSelectBox.bind("click", function(e) { e.stopPropagation(); });
+
+			batchSelectBox.bind("change", function() {
+				var checked = $(this).attr("checked");
+				$('input.chck-blk').attr("checked", checked).trigger("change");
+				if (checked)
+					$(this).attr("title", "Select none");
+				else
+					$(this).attr("title", "Select all");
+			});
+
+			$('#blkactn-udlt').after(batchSelectBox);
+		};
+
 		// Unbind the event handler, run the handler, and rebind it when we're done
 		// Avoids infinite recursion with functions that generate the same event they're handling
 		// Optional arguments can be passed in after the event arg and will be supplied to the handler function
@@ -699,7 +718,24 @@ var initApplication = function() {
 
 		// Bind event handlers to events
 		var initEventBindings = function() {
+
+			// Set up ad row initialization
 			$('tr.adRow').bind('setData', function(e, key, val) { runUnbound(fixAdRow, e, key, val); });
+
+			// Allow ad checkboxes to be selected by clicking the enclosing td
+			$('td.p-ads-td-blk').bind('click', function(e) {
+				var checkbox = $(this).find('input.chck-blk');
+				checkbox.attr('checked', !checkbox.attr('checked')).trigger('change');
+			});
+
+			// Highlight the enclosing td when an ad checkbox changes state
+			$('input.chck-blk').bind('click', function(e) { e.stopPropagation(); });
+			$('input.chck-blk').bind('change', function(e) {
+				if ($(this).attr('checked'))
+					$(this).parent().css('background-color', '#CCC');
+				else
+					$(this).parent().css('background-color', '#FFF');
+			});
 		};
 
 		// Fix things in the header and search box
@@ -720,6 +756,7 @@ var initApplication = function() {
 		highlightScoringSummary();
 
 		// Fix things in the footer
+		addBatchSelectBox();
 		addBatchDeleteBox();
 		fixNextButton();
 
