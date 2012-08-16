@@ -89,6 +89,20 @@ var initApplication = function() {
 		'yty3eWh216LeKUTOSCayVGlIH0g5S+1JJB+8Cxxt1rWkH7WNTNIPAlwA9Gm7OcXUHxUAAAAASUVORK5C' +
 		'YII=';
 
+	const WARNING_ICON_SRC       = 'data:image/png;base64,' +
+		'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29m' +
+		'dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJPSURBVDjLpZPLS5RhFMYfv9QJlelTQZwRb2OKlKuI' +
+		'NuHGLlBEBEOLxAu46oL0F0QQFdWizUCrWnjBaDHgThCMoiKkhUONTqmjmDp2GZ0UnWbmfc/ztrC+GbM2' +
+		'dXbv4ZzfeQ7vefKMMfifyP89IbevNNCYdkN2kawkCZKfSPZTOGTf6Y/m1uflKlC3LvsNTWArr9BT2LAf' +
+		'+W73dn5jHclIBFZyfYWU3or7T4K7AJmbl/yG7EtX1BQXNTVCYgtgbAEAYHlqYHlrsTEVQWr63RZFuqsf' +
+		'DAcdQPrGRR/JF5nKGm9xUxMyr0YBAEXXHgIANq/3ADQobD2J9fAkNiMTMSFb9z8ambMAQER3JC1XttkY' +
+		'GGZXoyZEGyTHRuBuPgBTUu7VSnUAgAUAWutOV2MjZGkehgYUA6O5A0AlkAyRnotiX3MLlFKduYCqAtuG' +
+		'XpyH0XQmOj+TIURt51OzURTYZdBKV2UBSsOIcRp/TVTT4ewK6idECAihtUKOArWcjq/B8tQ6UkUR31+O' +
+		'YXP4sTOdisivrkMyHodWejlXwcC38Fvs8dY5xaIId89VlJy7ACpCNCFCuOp8+BJ6A631gANQSg1mVmOx' +
+		'xGQYRW2nHMha4B5WA3chsv22T5/B13AIicWZmNZ6cMchTXUe81Okzz54pLi0uQWp+TmkZqMwxsBV74Or' +
+		'3od4OISPr0e3SHa3PX0f3HXKofNH/UIG9pZ5PeUth+CyS2EMkEqs4fPEOBJLsyske48/+xD8oxcAYPzs' +
+		'4QaS7RR2kbLTTOTQieczfzfTv8QPldGvTGoF6/8AAAAASUVORK5CYII=';
+
 	// Function to highlight a set of elements in a chosen colour (accepts an element or jQuery object, returns nothing)
 	const SET_HIGHLIGHT = function(e, colour) {
 		$(e).css('padding', '1px 2px').css('background-color', colour);
@@ -718,16 +732,68 @@ var initApplication = function() {
 
 						// Get rid of the old change handler and define our own with a prompt
 						deleteBox.unbind('change').change(function() {
-							if (confirm("Deleting for reason " + deleteBox.find("option:selected").text() + ".\n\nContinue?")) {
 
-								// Run the original handler function attached to the delete box
-								oldChangeHandler.call(deleteBox);
-							}
-							else {
+							// Called once per second during the deletion grace period
+							var incrementCountdown = function() {
+								var countdown = deleteConfirmation.find("span.countdown");
+								var count = Number(countdown.text());
 
-								// Reset and deselect the deletion reason box
-								deleteBox.val("1").blur();
-							}
+								// Decrement our countdown; if it's still greater than 0, keep counting down
+								if (--count > 0) {
+									countdown.text(count.toString());
+								}
+								// If our countdown has reached 0, it's time to delete the ad
+								else {
+									var aborted = false;
+									endCountdown(aborted);
+								}
+							};
+
+							// Use to end the deletion countdown
+							// If the argument is true, the countdown is ended without deleting the ad
+							// If it is false or not supplied, the countdown is ended and the ad is deleted
+							var endCountdown = function(aborted) {
+
+								// Stop counting down (countdownInterval is defined below, when we do our setInterval)
+								clearInterval(countdownInterval);
+
+								// Get rid of the confirmatio div
+								deleteConfirmation.remove();
+
+								// Don't annoy the user when they leave the page
+								$(window).unbind("beforeunload");
+
+								// If the countdown was aborted, reset and deselect the deletion box; otherwise, run the original deletion handler
+								if (aborted)
+									deleteBox.val("1").blur();
+								else
+									oldChangeHandler.call(deleteBox);
+							};
+
+							// Initialize warning icon
+							var warningIcon = $("<img>").attr("src", WARNING_ICON_SRC);
+							warningIcon.css("vertical-align", "middle").css("margin", "-4px 5px 0 0");
+
+							// Initialize deletion confirmation countdown
+							var deleteConfirmation = $("<div><b>Deleting in <span class='countdown'>5</span>...</b>&nbsp;&nbsp;&nbsp;(Click to cancel)</div>");
+							deleteConfirmation.css("padding", "5px").css("margin", "5px").css("border", "#F00 1px solid");
+							deleteConfirmation.css("cursor", "pointer");
+							deleteConfirmation.prepend(warningIcon);
+							deleteConfirmation.bind("click", function() {
+								var aborted = true;
+								endCountdown(aborted);
+							});
+
+							// Add the confirmation countdown div after the first br succeeding the deletion box
+							deleteBox.next("br").after(deleteConfirmation);
+
+							// Start our countdown
+							var countdownInterval = setInterval(incrementCountdown, 1000, deleteConfirmation);
+
+							// Show an alert if the countdown is interrupted by navigating away from the page
+							$(window).bind("beforeunload", function() {
+								return "There is a deletion pending. If you leave the page now, the ad will not be deleted.";
+							});
 						});
 
 						// Mark the adRow as fixed so it will not be changed again
