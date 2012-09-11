@@ -380,6 +380,7 @@ var initApplication = function() {
 				'[name="searchRequest.ip"][value!=""],' +
 				'[name="searchRequest.keyword"][value!=""],' +
 				'[name="searchRequest.agent"][value!=""],' +
+				'[name="searchRequest.reviewed"][value!=""],' +
 				'[name="searchRequest.flagType"][value!=""],' +
 				'[name="searchRequest.appealType"][value!="IGNORE"]'
 			).serialize();
@@ -757,7 +758,7 @@ var initApplication = function() {
 								// Stop counting down (countdownInterval is defined below, when we do our setInterval)
 								clearInterval(countdownInterval);
 
-								// Get rid of the confirmatio div
+								// Get rid of the confirmation div
 								deleteConfirmation.remove();
 
 								// Don't annoy the user when they leave the page
