@@ -711,6 +711,13 @@ var initApplication = function() {
 		// Do various things on each row of ads as they are loaded
 		var fixAdRow = function(evt) {
 
+			// Function to confirm any pending ad deletions
+			var confirmAllDeletions = function() {
+				$("div.deleteConfirmation").each(function() {
+					$(this).find("a").first().click();
+				})
+			};
+
 			// Sanity check to make sure that we are handling a setData event with a key/value pair as arguments
 			if (evt.type == "setData" && arguments.length >= 3) {
 
@@ -723,6 +730,27 @@ var initApplication = function() {
 				// If we're running this because the ad row finished loading, but the adRow isn't fixed yet, we can do our thing
 				if (adRowData['loaded'] && !$(adRow).data('fixed')) {
 
+					// Fix ad action links
+					var actionsBox = $(adRow).find("td.j-actns");
+
+					// We only need to do something if the ad actions pane has some event handlers attached
+					if (actionsBox.data("events") != null && typeof actionsBox.data("events").click != "undefined") {
+
+						// Save the click handler function in a variable, and also in a data attribute for later use
+						var oldClickHandler = actionsBox.data("events").click[0].handler;
+
+						// Get rid of the old click handler and define our own
+						actionsBox.unbind('click').bind('click', function(e) {
+
+							// If an action link is clicked and it is not disabled, confirm deletions
+							if ($(e.target).is('a') && !$(e.target).is('.p-ads-lnk-dsbld'))
+								confirmAllDeletions();
+
+							// Call Belen's click handler
+							oldClickHandler(e);
+						});
+					}
+
 					// Find our deletion reason selectbox and make sure it has a change event set already
 					var deleteBox = $(adRow).find('select.actn-dlt');
 					if (deleteBox.data("events") != null && typeof deleteBox.data("events").change != "undefined") {
@@ -734,67 +762,59 @@ var initApplication = function() {
 						// Get rid of the old change handler and define our own with a prompt
 						deleteBox.unbind('change').change(function() {
 
-							// Called once per second during the deletion grace period
-							var incrementCountdown = function() {
-								var countdown = deleteConfirmation.find("span.countdown");
-								var count = Number(countdown.text());
+							// Check for active deletion confirmation
+							if (!deleteBox.data("confirmationVisible")) {
 
-								// Decrement our countdown; if it's still greater than 0, keep counting down
-								if (--count > 0) {
-									countdown.text(count.toString());
-								}
-								// If our countdown has reached 0, it's time to delete the ad
-								else {
-									var aborted = false;
-									endCountdown(aborted);
-								}
-							};
+								// First thing, send all other pending deletions through
+								confirmAllDeletions();
 
-							// Use to end the deletion countdown
-							// If the argument is true, the countdown is ended without deleting the ad
-							// If it is false or not supplied, the countdown is ended and the ad is deleted
-							var endCountdown = function(aborted) {
+								// Finish deleting the ad or abort the deletion
+								// If the argument is true, the ad is deleted and the confirmation div hidden
+								// If it is false or not supplied, the delete box is reset, the confirmation div hidden, and the ad left alone
+								var confirmDelete = function(confirmationOK) {
 
-								// Stop counting down (countdownInterval is defined below, when we do our setInterval)
-								clearInterval(countdownInterval);
+									// Get rid of the confirmation div
+									deleteConfirmation.remove();
 
-								// Get rid of the confirmation div
-								deleteConfirmation.remove();
+									// Set a flag indicating that the confirmation box is being shown
+									deleteBox.data("confirmationVisible", false);
 
-								// Don't annoy the user when they leave the page
-								$(window).unbind("beforeunload");
+									// Don't annoy the user when they leave the page
+									$(window).unbind("beforeunload");
 
-								// If the countdown was aborted, reset and deselect the deletion box; otherwise, run the original deletion handler
-								if (aborted)
-									deleteBox.val("1").blur();
-								else
-									oldChangeHandler.call(deleteBox);
-							};
+									// If the deletion was aborted, reset and deselect the deletion box; otherwise, run the original deletion handler
+									if (confirmationOK)
+										oldChangeHandler.call(deleteBox);
+									else
+										deleteBox.val("1").blur();
+								};
 
-							// Initialize warning icon
-							var warningIcon = $("<img>").attr("src", WARNING_ICON_SRC);
-							warningIcon.css("vertical-align", "middle").css("margin", "-4px 5px 0 0");
+								// Initialize warning icon
+								var warningIcon = $("<img>").attr("src", WARNING_ICON_SRC);
+								warningIcon.css("vertical-align", "middle").css("margin", "-4px 5px 0 0");
 
-							// Initialize deletion confirmation countdown
-							var deleteConfirmation = $("<div><b>Deleting in <span class='countdown'>5</span>...</b>&nbsp;&nbsp;&nbsp;(Click to cancel)</div>");
-							deleteConfirmation.css("padding", "5px").css("margin", "5px").css("border", "#F00 1px solid");
-							deleteConfirmation.css("cursor", "pointer");
-							deleteConfirmation.prepend(warningIcon);
-							deleteConfirmation.bind("click", function() {
-								var aborted = true;
-								endCountdown(aborted);
-							});
+								// Initialize deletion confirmation countdown
+								var deleteConfirmation = $("<div><a href='#'>Confirm deletion</a> or <a href='#'>Cancel</a>");
+								deleteConfirmation.addClass("deleteConfirmation");
+								deleteConfirmation.css("padding", "5px").css("margin", "5px").css("border", "#F00 1px solid");
+								deleteConfirmation.find("a").first().css("padding", "0 10px").css("font-weight", "bold");
+								deleteConfirmation.prepend(warningIcon);
 
-							// Add the confirmation countdown div after the first br succeeding the deletion box
-							deleteBox.next("br").after(deleteConfirmation);
+								deleteConfirmation.find("a").unbind("click");
+								deleteConfirmation.find("a").first().bind("click", function() { confirmDelete(true);  });
+								deleteConfirmation.find("a").last() .bind("click", function() { confirmDelete(false); });
 
-							// Start our countdown
-							var countdownInterval = setInterval(incrementCountdown, 1000, deleteConfirmation);
+								// Add the confirmation countdown div after the first br succeeding the deletion box
+								deleteBox.next("br").after(deleteConfirmation);
 
-							// Show an alert if the countdown is interrupted by navigating away from the page
-							$(window).bind("beforeunload", function() {
-								return "There is a deletion pending. If you leave the page now, the ad will not be deleted.";
-							});
+								// Set a flag indicating that the confirmation box is being shown
+								deleteBox.data("confirmationVisible", true);
+
+								// Trigger any pending deletions on unload
+								$(window).bind("beforeunload", function() {
+									confirmAllDeletions();
+								});
+							}
 						});
 
 						// Mark the adRow as fixed so it will not be changed again
