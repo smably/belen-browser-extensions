@@ -304,6 +304,15 @@ var initApplication = function() {
 				return $(this).text() != '0';
 			})), COLOUR_RED_HIGHLIGHT);
 
+			// Highlight unreviewed ads
+			SET_HIGHLIGHT($('dd.meta-csagnt').filter(function() {
+
+				var isReviewedStatus = ($(this).prev('dt').text() == 'CS Reviewed:');
+				var isFalse = ($(this).text() == 'false');
+
+				return isReviewedStatus && isFalse;
+			}), COLOUR_RED_HIGHLIGHT);
+
 			// Highlight users with at least one note
 			SET_HIGHLIGHT($('a.actn-ntpd').filter(function() {
 
