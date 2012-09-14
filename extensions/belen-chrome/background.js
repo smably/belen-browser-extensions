@@ -812,7 +812,12 @@ var initApplication = function() {
 
 								// Trigger any pending deletions on unload
 								$(window).bind("beforeunload", function() {
-									confirmAllDeletions();
+									var scrollOffset = $("div.deleteConfirmation").first().offset().top;
+									$('body').animate(
+										{ scrollTop: scrollOffset },
+										{ duration: 250, easing: 'swing'}
+									);
+									return "You have an unconfirmed deletion. If you leave the page, it will be cancelled.";
 								});
 							}
 						});
