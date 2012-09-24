@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            Belen Enhancer
 // @namespace       http://cs.gumtree.com.au/
-// @version         1.10.1.1
+// @version         1.10.1.2
 // @author          Sylvan Mably
 // @description     Fixes various annoyances in Belen
 // @include         http://cs.gumtree.com.au/*
