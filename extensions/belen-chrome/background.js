@@ -27,10 +27,15 @@ var runInPageContext = function(fn) {
 var initApplication = function() {
 
 	// Constants!
+	const HOST_BELEN             = "cs.gumtree.com.au";
+	const HOST_HESK              = "help.gumtree.com.au";
+
 	const PATH_MANAGE_ADS        = "/searchAds.do";
 	const PATH_REPLY_TS          = "/replyts/screening.do";
 	const PATH_SPAM_REPORT       = "/spam-report.do";
 	const PATH_JQUERY            = "/js/lib/jquery-1.4.2.min.js";
+	const PATH_HESK_MAIN         = "/admin/admin_main.php";
+	const PATH_HESK_TICKET       = "/admin/admin_ticket.php";
 
 	const COLOUR_GREEN_HIGHLIGHT = "#BEA";
 	const COLOUR_RED_HIGHLIGHT   = "#FCB";
@@ -108,6 +113,21 @@ var initApplication = function() {
 		$(e).css('padding', '1px 2px').css('background-color', colour);
 	};
 
+	// Add links inside elements that do not already have links and return the link added
+	var LINK_WRAP = function(e) {
+
+		// Find any elements that have not yet been wrapped
+		var unwrapped = $(e).filter(function() {
+			return $(this).data('wrapped') != true;
+		});
+
+		// Mark them as wrapped
+		unwrapped.data('wrapped', true);
+
+		// Wrap them in link tags and return the link tag added
+		return unwrapped.wrapInner($('<a></a>').attr('target', '_blank')).find('a');
+	};
+
 	// Function to insert jQuery if it does not already exist in the page
 	// If successful, runs the callback function passed in
 	const injectJQuery = function(callback) {
@@ -144,28 +164,13 @@ var initApplication = function() {
 	}
 
 	// Do the stuff in Manage Ads...
-	if (location.pathname == PATH_MANAGE_ADS) {
+	if (location.hostname == HOST_BELEN && location.pathname == PATH_MANAGE_ADS) {
 
 		// Remove the maxLength attribute from the search keyword box
 		var extendKeywordField = function() { $('#srch-kwrd').removeAttr('maxlength'); };
 
 		// Add links to the ad ID, machine ID, and phone number for each ad
 		var linkifyAds = function() {
-
-			// Add links inside elements that do not already have links and return the link added
-			var linkWrap = function(e) {
-
-				// Find any elements that have not yet been wrapped
-				var unwrapped = $(e).filter(function() {
-					return $(this).data('wrapped') != true;
-				});
-
-				// Mark them as wrapped
-				unwrapped.data('wrapped', true);
-
-				// Wrap them in link tags and return the link tag added
-				return unwrapped.wrapInner($('<a></a>').attr('target', '_blank')).find('a');
-			};
 
 			// Set a CSS rule to override the pointer style that gets added by jquery.belen-tooltip.js
 			var userHistoryStyle = document.createElement('style');
@@ -174,7 +179,7 @@ var initApplication = function() {
 			document.body.appendChild(userHistoryStyle);
 
 			// Wrap the text of each of the spans in the user history box in link tags
-			var userHistoryLinks = linkWrap($('span.meta-usrads-pstd,span.meta-usrads-ok,span.meta-usrads-bad'));
+			var userHistoryLinks = LINK_WRAP($('span.meta-usrads-pstd,span.meta-usrads-ok,span.meta-usrads-bad'));
 
 			// Apply the span class to child link tags to preserve link colour
 			userHistoryLinks.addClass(function() {
@@ -225,9 +230,9 @@ var initApplication = function() {
 			$('a.meta-usrads-bad').attr('title', 'View blocked and admin deleted ads from this user');
 
 			// Find the parent elements of the ad ID, machine ID, and phone number, wrap their contents in link tags
-			var adIDLinks = linkWrap($('dt:contains("Ad-Id:")').next('dd'));
-			var machineIDLinks = linkWrap($('dt:contains("Machine Id:")').next('dd').find('div'));
-			var phoneLinks = linkWrap($('dt:contains("Phone:")').next('dd'));
+			var adIDLinks = LINK_WRAP($('dt:contains("Ad-Id:")').next('dd'));
+			var machineIDLinks = LINK_WRAP($('dt:contains("Machine Id:")').next('dd').find('div'));
+			var phoneLinks = LINK_WRAP($('dt:contains("Phone:")').next('dd'));
 
 			// Restore red highlighting on blocked machine IDs
 			machineIDLinks.filter('dd.p-ads-dd-blocked a').addClass('p-ads-dd-blocked');
@@ -922,7 +927,7 @@ var initApplication = function() {
 	}
 
 	// Do the stuff in ReplyTS
-	else if (location.pathname == PATH_REPLY_TS) {
+	else if (location.hostname == HOST_BELEN && location.pathname == PATH_REPLY_TS) {
 
 		// Set the "ad ID" link to show all replies from that ad, not just the ones from the past day
 		var fixIdLinks = function() {
@@ -992,7 +997,7 @@ var initApplication = function() {
 	}
 
 	// Do the stuff in the spam reports
-	else if (location.pathname == PATH_SPAM_REPORT) {
+	else if (location.hostname == HOST_BELEN && location.pathname == PATH_SPAM_REPORT) {
 
 		// Add links to message IDs, ad IDs, and IPs in the spam report
 		var linkifySpamReport = function() {
@@ -1010,6 +1015,40 @@ var initApplication = function() {
 
 		// No jQuery by default, so add it in and pass our linkify function in as a callback
 		injectJQuery(linkifySpamReport);
+	}
+
+	// Do the stuff in Hesk
+	else if (location.hostname == HOST_HESK && location.pathname == PATH_HESK_TICKET) {
+
+		// Find ad ID field
+		var ip      = LINK_WRAP($('td.ticketalt').find('td').filter(function() { return $(this).text() == "IP:";     }).next());
+		var account = $('td.ticketalt').find('td').filter(          function() { return $(this).text() == "Email:";  }).next().find('a').first();
+		var adID    = LINK_WRAP($('td.tickettd').filter(            function() { return $(this).text() == "AdId:";   }).next());
+		var machID  = LINK_WRAP($('td.tickettd').filter(            function() { return $(this).text() == "MachId:"; }).next());
+
+		// Wrap IP in a link tag and set it to point to a Belen IP search
+		ip.attr('href', function() {
+			return "http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE&searchRequest.ip=" + $(this).text();
+		});
+
+		// Add account search link
+		account.attr('target', '_blank').attr('href', function() {
+			return "http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE&idAndEmailField=" + $(this).text();
+		});
+
+		// Make sure it's the right format for an ad ID
+		if (adID.text().match(/\d+/)) {
+
+			// If so, wrap it in a link tag and set it to point to a Belen ad ID search
+			adID.attr('href', function() {
+				return "http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&idAndEmailField=" + $(this).text();
+			});
+		}
+
+		// Wrap machine ID in a link tag and set it to point to a Belen machine ID search
+		machID.attr('href', function() {
+			return "http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE&machId=" + $(this).text();
+		});
 	}
 };
 
