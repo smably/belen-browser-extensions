@@ -1055,6 +1055,13 @@ var initApplication = function() {
 		machID.attr('href', function() {
 			return "http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE&machId=" + $(this).text();
 		});
+
+		// Allow machine IDs to break every 32 characters
+		machID.contents().filter(function() {
+			return this.nodeType == Node.TEXT_NODE;
+		}).replaceWith(function() {
+			return $(this).text().replace(/(\S{32})/g, "$1&#8203;");
+		});
 	}
 };
 
