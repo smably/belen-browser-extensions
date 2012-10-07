@@ -702,40 +702,6 @@ var initApplication = function() {
 			$('#blkactn-udlt').after(batchSelectBox);
 		};
 
-		// Hide adRows where CS Reviewed field does not match search field
-		var fixCSReviewedSearch = function() {
-
-			// Grab value of CS Reviewed search field
-			var csReviewedSearchParam = $('#srch-csrvw').val();
-
-			// We only need to hide ads if the CS Reviewed field is set to "reviewed" or "not reviewed"
-			if (csReviewedSearchParam != "ALL") {
-
-				// Initialize the hidden row counter
-				var hiddenRowCount = 0;
-
-				// On each adRow, check the reviewed status
-				// If it does not match the search parameter, delete the row and increment the counter
-				$('tr.adRow').each(function() {
-					var csReviewedStatus = $(this).find('dd.meta-csagnt').filter(function() {
-						return $(this).prev('dt').text() == 'CS Reviewed:';
-					}).text();
-
-					if ((csReviewedSearchParam == "NOT_REVIEWED" && csReviewedStatus == "true") ||
-					(csReviewedSearchParam == "REVIEWED" && csReviewedStatus == "false")) {
-						$(this).remove();
-						hiddenRowCount++;
-					}
-				});
-
-				// If any rows were hidden, show a message by the page counter at the top of the page
-				if (hiddenRowCount > 0) {
-					var pageCount = $("#ads-srchfrm-hits").prev().find("fieldset");
-					pageCount.append("<em>(" + hiddenRowCount + " ads hidden)</em>");
-				}
-			}
-		};
-
 		// Unbind the event handler, run the handler, and rebind it when we're done
 		// Avoids infinite recursion with functions that generate the same event they're handling
 		// Optional arguments can be passed in after the event arg and will be supplied to the handler function
@@ -901,9 +867,6 @@ var initApplication = function() {
 		createPermalink();
 		extendKeywordField();
 		addResetIcon();
-
-		// Hide ads that should not appear in search results
-		fixCSReviewedSearch();
 
 		// Add borders between ads
 		addAdSeparators();
