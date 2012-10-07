@@ -979,53 +979,6 @@ var initApplication = function() {
 		// No jQuery by default, so add it in and pass our linkify function in as a callback
 		injectJQuery(linkifySpamReport);
 	}
-
-	// Do the stuff in Hesk
-	else if (location.hostname == HOST_HESK && location.pathname == PATH_HESK_TICKET) {
-
-		// Find ad and account fields
-		var ip      = LINK_WRAP($('td.ticketalt').find('td').filter(function() { return $(this).text() == "IP:";     }).next());
-		var account = $('td.ticketalt').find('td').filter(          function() { return $(this).text() == "Email:";  }).next().find('a').first();
-		var adID    = $('td.tickettd').filter(                      function() { return $(this).text() == "AdId:";   }).next();
-		var machID  = LINK_WRAP($('td.tickettd').filter(            function() { return $(this).text() == "MachId:"; }).next());
-
-		// Wrap IP in a link tag and set it to point to a Belen IP search
-		ip.attr('href', function() {
-			return "http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE&searchRequest.ip=" + $(this).text();
-		});
-
-		// Add account search link
-		account.attr('target', '_blank').attr('href', function() {
-			return "http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE&idAndEmailField=" + $(this).text();
-		});
-
-		// If the ad ID field has something resembling an ad ID, proceed with the linkification
-		if (adID.text().match(/\d+/)) {
-
-			// Create the basis for our ad ID link, using $1 which expands to the text in the first regex capture group
-			var adIDLink = $("<a>$1</a>");
-			adIDLink.attr('target', '_blank').attr('href', 'http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&idAndEmailField=$1');
-
-			// Find the text node containing ad IDs and wrap any sequence of digits in link tags
-			adID.contents().filter(function() {
-				return this.nodeType == Node.TEXT_NODE;
-			}).replaceWith(function() {
-				return $(this).text().replace(/(\d+)/g, adIDLink[0].outerHTML);
-			});
-		}
-
-		// Wrap machine ID in a link tag and set it to point to a Belen machine ID search
-		machID.attr('href', function() {
-			return "http://cs.gumtree.com.au/searchAds.do?formAction=submitSearch&searchRequest.dateRangeType=NO_RANGE&machId=" + $(this).text();
-		});
-
-		// Allow machine IDs to break every 32 characters
-		machID.contents().filter(function() {
-			return this.nodeType == Node.TEXT_NODE;
-		}).replaceWith(function() {
-			return $(this).text().replace(/(\S{32})/g, "$1&#8203;");
-		});
-	}
 };
 
 // Main function
