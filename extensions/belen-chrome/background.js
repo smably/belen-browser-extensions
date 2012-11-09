@@ -190,7 +190,7 @@ var initApplication = function() {
 			userHistoryLinks.attr('href', function() {
 
 				// Find the email address of the user associated with the ad and save it
-				var userEmail = $(this).closest('dl.p-ads-dl').find('dd.meta-email :first-child').text();
+				var userEmail = $(this).closest('dl.p-ads-dl').find('a.meta-email-link').first().text();
 
 				// Create search parameters out of the supplied name and value (or values)
 				var buildSearchParams = function(name, values) {
