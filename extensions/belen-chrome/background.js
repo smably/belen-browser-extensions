@@ -335,10 +335,7 @@ var initApplication = function() {
 			if ($('#srch-kwrd').length > 0 && $('#srch-kwrd').val() != "") {
 
 				// Extract words and quoted strings from search keywords
-<<<<<<< HEAD
-=======
 				// FIXME Why does this match uppercase AND/OR/NOT?
->>>>>>> Improve search term highlighting
 				var keywords = $('#srch-kwrd').val().match(/".+?"|\b(?!and|not|or)\w{3,}\b/g);
 
 				// Helper function to highlight all occurrences of string str in jQuery element el
