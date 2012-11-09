@@ -438,7 +438,7 @@ var initApplication = function() {
 				$('div.multiSelectOptions').multiSelectUpdateSelected(o);
 
 				// Reset the regular selects and the text inputs
-				$('#ads-srchfrm-params input.c-inpt-frm').val('');
+				$('#ads-srchfrm-params input.c-inpt-frm,input.c-txtfld-medium').val('');
 				$('#ads-srchfrm-params select.c-slct-frm option').removeAttr('selected');
 
 				// Restore default form values
