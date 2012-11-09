@@ -745,11 +745,8 @@ var initApplication = function() {
 				var adRowData = {};
 				adRowData[arguments[1]] = arguments[2];
 
-				// TODO only fix adRows that are visible!
-				// If we're running this because the ad row finished loading, but the adRow isn't fixed yet, we can do our thing
-				if (adRowData['loaded'] && !$(adRow).data('fixed')) {
-
-					// Fix ad action links
+				// Fix ad action links
+				var fixAdActionLinks = function() {
 					var actionsBox = $(adRow).find("td.j-actns");
 
 					// We only need to do something if the ad actions pane has some event handlers attached
@@ -769,6 +766,10 @@ var initApplication = function() {
 							oldClickHandler(e);
 						});
 					}
+				};
+
+				// Prompt for confirmation when deleting ads
+				var addDeleteConfirmation = function() {
 
 					// Find our deletion reason selectbox and make sure it has a change event set already
 					var deleteBox = $(adRow).find('select.actn-dlt');
@@ -840,10 +841,19 @@ var initApplication = function() {
 								});
 							}
 						});
-
-						// Mark the adRow as fixed so it will not be changed again
-						$(adRow).data('fixed', true);
 					}
+				};
+
+				// TODO only fix adRows that are visible!
+				// If we're running this because the ad row finished loading, but the adRow isn't fixed yet, we can do our thing
+				if (adRowData['loaded'] && !$(adRow).data('fixed')) {
+
+					// Do the stuff on the adRow
+					fixAdActionLinks();
+					addDeleteConfirmation();
+
+					// Mark the adRow as fixed so it will not be changed again
+					$(adRow).data('fixed', true);
 				}
 			}
 		};
@@ -875,6 +885,7 @@ var initApplication = function() {
 		// Add borders between ads
 		addAdSeparators();
 
+		// TODO make this section events-based --------------------------------
 		// Add links in ads
 		linkifyAds();
 		addBlockImageLinks();
@@ -883,6 +894,7 @@ var initApplication = function() {
 		hlAdRisks();
 		hlSearchTerms();
 		highlightScoringSummary();
+		// --------------------------------------------------------------------
 
 		// Fix things in the footer
 		addBatchSelectBox();
@@ -891,10 +903,10 @@ var initApplication = function() {
 
 		// Set up event hooks
 		initEventBindings();
-	}
+	};
 
 	// Do the stuff in ReplyTS
-	else if (location.hostname == HOST_BELEN && location.pathname == PATH_REPLY_TS) {
+	if (location.hostname == HOST_BELEN && location.pathname == PATH_REPLY_TS) {
 
 		// Set the "ad ID" link to show all replies from that ad, not just the ones from the past day
 		var fixIdLinks = function() {
