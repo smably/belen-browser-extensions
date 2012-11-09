@@ -2,273 +2,324 @@
 // If we catch the page load at just the right time, we can replace that with our own code.
 // The following HTML generates an indented, rainbow-coloured category list that is hopefully easier to use than the default.
 var catSelectOpts =
-	'<option disabled="disabled" class="cat1-lvl1 cat-lvl1">Automotive</option>' +
-	'<option disabled="disabled" class="cat1-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Caravan &amp; Campervan</option>' +
-	'<option value="20011"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Campervan</option>' +
-	'<option value="20012"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Caravan</option>' +
-	'<option value="18320"       class="cat1-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Cars</option>' +
-	'<option value="18460"       class="cat1-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Heavy, Farming &amp; Agriculture Equipment</option>' +
-	'<option disabled="disabled" class="cat1-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Motorcycles &amp; Scooters</option>' +
-	'<option value="18627"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Accessories</option>' +
-	'<option value="18626"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Motorcycles</option>' +
-	'<option value="18630"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Motorcycles &amp; Scooters</option>' +
-	'<option value="18628"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Parts</option>' +
-	'<option value="18629"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Scooters</option>' +
-	'<option value="18375"       class="cat1-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Other Automotive</option>' +
-	'<option disabled="disabled" class="cat1-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Parts &amp; Accessories</option>' +
-	'<option value="18473"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Audio, GPS, &amp; Car Alarms</option>' +
-	'<option value="18474"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Auto Body parts</option>' +
-	'<option value="18479"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Brakes &amp; Suspension</option>' +
-	'<option value="18475"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Engine, Engine Parts &amp; Transmission</option>' +
-	'<option value="18480"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Oil, Coolant &amp; Liquids</option>' +
-	'<option value="18478"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Parts &amp; Accessories</option>' +
-	'<option value="18481"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Truck Parts</option>' +
-	'<option value="18476"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wheels, Tyres &amp; Rims</option>' +
-	'<option value="18482"       class="cat1-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wrecking</option>' +
-	'<option value="20037"       class="cat1-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Trailers</option>' +
-	'<option value="18404"       class="cat1-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Van &amp; Ute</option>' +
-	'<option disabled="disabled" class="cat2-lvl1 cat-lvl1">Boats &amp; Jet Skis</option>' +
-	'<option value="20004"       class="cat2-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Boat Accessories &amp; Parts</option>' +
-	'<option value="20024"       class="cat2-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Jet Skis</option>' +
-	'<option value="20025"       class="cat2-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Kayaks &amp; Paddle</option>' +
-	'<option value="20026"       class="cat2-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Motorboats &amp; Powerboats</option>' +
-	'<option value="20027"       class="cat2-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Other Boats &amp; Jet Skis</option>' +
-	'<option value="20028"       class="cat2-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Sail Boats</option>' +
-	'<option value="20029"       class="cat2-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Tinnies &amp; Dinghies</option>' +
-	'<option disabled="disabled" class="cat3-lvl1 cat-lvl1">Business Services</option>' +
-	'<option value="20010"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Appliance &amp; Phone Repair</option>' +
-	'<option value="18461"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Automotive</option>' +
-	'<option disabled="disabled" class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Building &amp; Trades</option>' +
-	'<option value="18634"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Airconditioning &amp; Heating</option>' +
-	'<option value="18635"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carpentry</option>' +
-	'<option value="20014"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Concreting &amp; Paving</option>' +
-	'<option value="18636"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cleaning</option>' +
-	'<option value="18637"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Electrical</option>' +
-	'<option value="20015"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fencing &amp; Gates</option>' +
-	'<option value="20016"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Flooring</option>' +
-	'<option value="20017"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Handymen</option>' +
-	'<option value="18638"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Landscaping &amp; Gardening</option>' +
-	'<option value="18642"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Building &amp; Trades</option>' +
-	'<option value="18639"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Painting &amp; Decorating</option>' +
-	'<option value="18640"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Plastering &amp; Tiling</option>' +
-	'<option value="18641"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Plumbing</option>' +
-	'<option value="20030"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Roofing</option>' +
-	'<option value="18465"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Childcare &amp; Nanny</option>' +
-	'<option value="18442"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Cleaning</option>' +
-	'<option value="18358"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Computer, Telecom &amp; Freelance</option>' +
-	'<option value="18446"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Courses &amp; Training</option>' +
-	'<option value="20013"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Dress Making &amp; Alterations</option>' +
-	'<option value="18443"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Entertainment</option>' +
-	'<option value="18469"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Graphic &amp; Web Design</option>' +
-	'<option disabled="disabled" class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Health &amp; Beauty</option>' +
-	'<option value="18644"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alternative Therapies</option>' +
-	'<option value="18645"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Beauty Treatments</option>' +
-	'<option value="18646"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hairdressing</option>' +
-	'<option value="18647"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Massages</option>' +
-	'<option value="18648"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Health &amp; Beauty</option>' +
-	'<option value="18445"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Landscaping &amp; Gardening</option>' +
-	'<option value="18466"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Language &amp; Tutoring</option>' +
-	'<option value="20009"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Mechanics &amp; Garages</option>' +
-	'<option value="18472"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Musicians &amp; Artists</option>' +
-	'<option value="18360"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Other Business Services</option>' +
-	'<option value="18447"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Party &amp; Catering</option>' +
-	'<option value="18444"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Personal Training</option>' +
-	'<option disabled="disabled" class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Pet Services</option>' +
-	'<option value="20019"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Grooming</option>' +
-	'<option value="18439"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Pet Services</option>' +
-	'<option value="20020"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sitting</option>' +
-	'<option value="20021"       class="cat3-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Training</option>' +
-	'<option value="18448"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Photography &amp; Video</option>' +
-	'<option value="18467"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Real Estate</option>' +
-	'<option value="18643"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Removals &amp; Storage</option>' +
-	'<option value="18449"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Resume</option>' +
-	'<option value="18451"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Tax, Insurance &amp; Financial</option>' +
-	'<option value="18453"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Taxi, Chauffeur &amp; Airport Transfer</option>' +
-	'<option value="18452"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Travel Agent</option>' +
-	'<option value="18455"       class="cat3-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Wedding &amp; Venues</option>' +
-	'<option disabled="disabled" class="cat4-lvl1 cat-lvl1">Community</option>' +
-	'<option value="18324"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Activities &amp; Hobbies</option>' +
-	'<option value="18325"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Classes</option>' +
-	'<option value="20000"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Dance Partners</option>' +
-	'<option value="18483"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Events</option>' +
-	'<option value="18486"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Garage Sale</option>' +
-	'<option value="18330"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Language Swap</option>' +
-	'<option value="18326"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Lost &amp; Found</option>' +
-	'<option value="18441"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Missed Connections</option>' +
-	'<option value="18327"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Musicians &amp; Artists</option>' +
-	'<option value="18333"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Other Community</option>' +
-	'<option value="18331"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Sports Partners</option>' +
-	'<option value="18332"       class="cat4-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Rideshare &amp; Travel Partners</option>' +
-	'<option disabled="disabled" class="cat5-lvl1 cat-lvl1">Tickets</option>' +
-	'<option value="20001"       class="cat5-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Bus, Train &amp; Plane</option>' +
-	'<option value="18484"       class="cat5-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Concerts</option>' +
-	'<option value="18488"       class="cat5-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Other Tickets</option>' +
-	'<option value="18485"       class="cat5-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Sport</option>' +
-	'<option value="20002"       class="cat5-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Theatre/Film</option>' +
-	'<option disabled="disabled" class="cat6-lvl1 cat-lvl1">Jobs</option>' +
-	'<option disabled="disabled" class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Construction &amp; Trades</option>' +
-	'<option value="18501"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Architecture</option>' +
-	'<option value="18502"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Building Maintenance</option>' +
-	'<option value="18504"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Engineering</option>' +
-	'<option value="18505"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Construction &amp; Trades</option>' +
-	'<option value="18503"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tradesmen &amp; Labour</option>' +
-	'<option value="18491"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Sales &amp; Call Centres</option>' +
-	'<option value="18384"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Farming &amp; Veterinary</option>' +
-	'<option value="18299"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Finance</option>' +
-	'<option value="18385"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Gardening &amp; Landscaping</option>' +
-	'<option value="18470"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Graphic &amp; Web Design</option>' +
-	'<option value="18464"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Health,Sports &amp; Beauty</option>' +
-	'<option value="18348"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Healthcare &amp; Nursing</option>' +
-	'<option disabled="disabled" class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Hospitality</option>' +
-	'<option value="18492"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bar Staff</option>' +
-	'<option value="20032"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Baristas</option>' +
-	'<option value="18343"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Chefs &amp; Cooks</option>' +
-	'<option value="18493"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Concierge</option>' +
-	'<option value="20033"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Management</option>' +
-	'<option value="20034"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kitchen Hand</option>' +
-	'<option value="18495"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Hospitality</option>' +
-	'<option value="18494"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Waiting Staff</option>' +
-	'<option value="18386"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Housekeeping</option>' +
-	'<option value="18344"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;IT</option>' +
-	'<option value="20036"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Real Estate &amp; Housing</option>' +
-	'<option value="20035"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Legal</option>' +
-	'<option value="18463"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Moving &amp; Removals</option>' +
-	'<option disabled="disabled" class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Nanny &amp; Babysitting</option>' +
-	'<option value="18496"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Live-in Nannies</option>' +
-	'<option value="18497"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Live-out Nannies</option>' +
-	'<option value="18498"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maternity Nurse</option>' +
-	'<option value="18499"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nanny Share</option>' +
-	'<option value="18500"       class="cat6-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Nanny &amp; Babysitting</option>' +
-	'<option value="18351"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Office</option>' +
-	'<option value="18347"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Other Jobs</option>' +
-	'<option value="18387"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Recruitment &amp; HR</option>' +
-	'<option value="18353"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Retail</option>' +
-	'<option value="18354"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Sales &amp; Marketing</option>' +
-	'<option value="18388"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Sports &amp; Healthclub</option>' +
-	'<option value="18355"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Teaching &amp; Childcare</option>' +
-	'<option value="18428"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Training &amp; Development</option>' +
-	'<option value="18490"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Transport &amp; Logistics</option>' +
-	'<option value="18489"       class="cat6-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Volunteer</option>' +
-	'<option disabled="disabled" class="cat7-lvl1 cat-lvl1">Pets</option>' +
-	'<option value="18456"       class="cat7-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Birds</option>' +
-	'<option value="18435"       class="cat7-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Cats &amp; Kittens</option>' +
-	'<option value="18434"       class="cat7-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Dogs &amp; Puppies</option>' +
-	'<option value="20022"       class="cat7-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Fish</option>' +
-	'<option value="18632"       class="cat7-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Horses &amp; Ponies</option>' +
-	'<option value="18457"       class="cat7-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Livestock</option>' +
-	'<option value="18437"       class="cat7-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Lost &amp; Found</option>' +
-	'<option value="18436"       class="cat7-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Other Pets</option>' +
-	'<option value="18438"       class="cat7-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Pet Products</option>' +
-	'<option value="20023"       class="cat7-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Rabbits</option>' +
-	'<option value="18649"       class="cat7-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Reptiles &amp; Amphibians</option>' +
-	'<option disabled="disabled" class="cat8-lvl1 cat-lvl1">Real Estate</option>' +
-	'<option value="18363"       class="cat8-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Couchsurfing</option>' +
-	'<option value="20031"       class="cat8-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Land For Sale</option>' +
-	'<option value="18365"       class="cat8-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Office Space &amp; Commercial</option>' +
-	'<option value="18302"       class="cat8-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Other Real Estate</option>' +
-	'<option value="18366"       class="cat8-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Parking &amp; Storage</option>' +
-	'<option value="18367"       class="cat8-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Property For Sale</option>' +
-	'<option value="18364"       class="cat8-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Property for Rent</option>' +
-	'<option value="18511"       class="cat8-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Roomshare</option>' +
-	'<option value="18294"       class="cat8-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Flatshare &amp; Houseshare</option>' +
-	'<option value="18295"       class="cat8-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Short Term</option>' +
-	'<option disabled="disabled" class="cat9-lvl1 cat-lvl1">Stuff for Sale</option>' +
-	'<option value="18297"       class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Antiques &amp; Collectables</option>' +
-	'<option value="18625"       class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Audio</option>' +
-	'<option disabled="disabled" class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Baby &amp; Maternity</option>' +
-	'<option value="18577"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Baby Carriers</option>' +
-	'<option value="18578"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Baby Clothing</option>' +
-	'<option value="18579"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Baths</option>' +
-	'<option value="18580"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cots &amp; Bedding</option>' +
-	'<option value="18581"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Feeding</option>' +
-	'<option value="18585"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Indoor Toys</option>' +
-	'<option value="18582"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maternity Clothing</option>' +
-	'<option value="18584"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Baby &amp; Maternity</option>' +
-	'<option value="18586"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Outdoor Toys</option>' +
-	'<option value="18583"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prams &amp; Strollers</option>' +
-	'<option disabled="disabled" class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Books &amp; Games</option>' +
-	'<option value="18587"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Children\\\'s Books</option>' +
-	'<option value="18588"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Comic Books</option>' +
-	'<option value="18589"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fiction Books</option>' +
-	'<option value="18595"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Games</option>' +
-	'<option value="18590"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Graphic Novels</option>' +
-	'<option value="18591"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Magazines</option>' +
-	'<option value="18592"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Non Fiction Books</option>' +
-	'<option value="18596"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Books &amp; Games</option>' +
-	'<option value="18593"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Textbooks</option>' +
-	'<option value="18594"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Travel Guides</option>' +
-	'<option value="18468"       class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Business For Sale</option>' +
-	'<option disabled="disabled" class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Cameras</option>' +
-	'<option value="18622"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Digital Camera Accessories</option>' +
-	'<option value="18621"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Digital Cameras</option>' +
-	'<option value="18623"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Non Digital Cameras</option>' +
-	'<option value="18624"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Cameras</option>' +
-	'<option value="18620"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Video Camera Accessories</option>' +
-	'<option value="18619"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Video Cameras</option>' +
-	'<option value="18307"       class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;CDs &amp; DVDs</option>' +
-	'<option disabled="disabled" class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Clothing</option>' +
-	'<option value="18575"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Accessories</option>' +
-	'<option value="18574"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bags</option>' +
-	'<option value="18571"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Men\\\'s Clothing</option>' +
-	'<option value="18573"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Men\\\'s Shoes</option>' +
-	'<option value="18576"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Clothing</option>' +
-	'<option value="18570"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Women\\\'s Clothing</option>' +
-	'<option value="18572"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Women\\\'s Shoes</option>' +
-	'<option disabled="disabled" class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Computers &amp; Software</option>' +
-	'<option value="18552"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Components</option>' +
-	'<option value="18551"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Desktops</option>' +
-	'<option value="18554"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Laptop Accessories</option>' +
-	'<option value="18553"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Laptops</option>' +
-	'<option value="18558"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Computers &amp; Software</option>' +
-	'<option value="18555"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Printers</option>' +
-	'<option value="18556"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Software</option>' +
-	'<option value="18557"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Speakers</option>' +
-	'<option disabled="disabled" class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Home &amp; Garden</option>' +
-	'<option value="18402"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Appliances</option>' +
-	'<option value="18398"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Backyard &amp; Bbq</option>' +
-	'<option value="18399"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bedroom</option>' +
-	'<option value="18400"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kitchen</option>' +
-	'<option value="18401"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Living room</option>' +
-	'<option value="18403"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Home &amp; Garden</option>' +
-	'<option disabled="disabled" class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Jewellery</option>' +
-	'<option value="18603"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Men\\\'s Jewellery</option>' +
-	'<option value="18606"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Jewellery</option>' +
-	'<option value="18604"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unisex Jewellery</option>' +
-	'<option value="18605"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Watches</option>' +
-	'<option value="18602"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Women\\\'s Jewellery</option>' +
-	'<option disabled="disabled" class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Musical Instruments</option>' +
-	'<option value="18612"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DJ Gear &amp; Lighting</option>' +
-	'<option value="18608"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Guitars &amp; Amps</option>' +
-	'<option value="18613"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Instrument Accessories</option>' +
-	'<option value="18609"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyboards &amp; Pianos</option>' +
-	'<option value="18614"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Musical Instruments</option>' +
-	'<option value="18610"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Percussion &amp; Drums</option>' +
-	'<option value="18611"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Woodwind &amp; Brass</option>' +
-	'<option value="18319"       class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Other Stuff For Sale</option>' +
-	'<option disabled="disabled" class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Phones</option>' +
-	'<option value="18599"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Home Phones</option>' +
-	'<option value="18598"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mobile Phone Accessories</option>' +
-	'<option value="18597"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mobile Phones</option>' +
-	'<option value="18600"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Phones</option>' +
-	'<option disabled="disabled" class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Sport &amp; Fitness</option>' +
-	'<option value="18560"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bicycles</option>' +
-	'<option value="18561"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boxing &amp; Martial Arts</option>' +
-	'<option value="18562"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Camping &amp; Hiking</option>' +
-	'<option value="18563"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fishing</option>' +
-	'<option value="18564"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Golf</option>' +
-	'<option value="18565"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gym &amp; Fitness</option>' +
-	'<option value="18566"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Luggage</option>' +
-	'<option value="18569"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Sports &amp; Fitness</option>' +
-	'<option value="18559"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Racket Sports</option>' +
-	'<option value="18567"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Skateboards &amp; Rollerblades</option>' +
-	'<option value="18568"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Surfing</option>' +
-	'<option value="18430"       class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Tools &amp; DIY</option>' +
-	'<option value="18316"       class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;TV &amp; DVD players</option>' +
-	'<option disabled="disabled" class="cat9-lvl2 cat-lvl2">&nbsp;&nbsp;&nbsp;&nbsp;Video Games &amp; Consoles</option>' +
-	'<option value="18616"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Accessories</option>' +
-	'<option value="18617"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Consoles</option>' +
-	'<option value="18618"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Video Games &amp; Consoles</option>' +
-	'<option value="18615"       class="cat9-lvl3 cat-lvl3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Video Games</option>';
+	'<option class="cat1-lvl1 cat-lvl1" disabled="disabled">Antiques, Art & Collectables</option>' +
+	'<option class="cat1-lvl2 cat-lvl2" value="20038">&nbsp;&nbsp;&nbsp;&nbsp;Antiques</option>' +
+	'<option class="cat1-lvl2 cat-lvl2" value="20039">&nbsp;&nbsp;&nbsp;&nbsp;Art</option>' +
+	'<option class="cat1-lvl2 cat-lvl2" value="20040">&nbsp;&nbsp;&nbsp;&nbsp;Collectables</option>' +
+	'<option class="cat1-lvl2 cat-lvl2" value="20041">&nbsp;&nbsp;&nbsp;&nbsp;Other Antiques, Art & Collectables</option>' +
+	'<option class="cat2-lvl1 cat-lvl1" disabled="disabled">Automotive</option>' +
+	'<option class="cat2-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Caravan & Campervan</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="20011">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Campervan</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="20012">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Caravan</option>' +
+	'<option class="cat2-lvl2 cat-lvl2" value="18320">&nbsp;&nbsp;&nbsp;&nbsp;Cars, Vans & Utes</option>' +
+	'<option class="cat2-lvl2 cat-lvl2" value="18460">&nbsp;&nbsp;&nbsp;&nbsp;Heavy, Farming & Agriculture Equipment</option>' +
+	'<option class="cat2-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Motorcycles & Scooters</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18627">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Accessories</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18626">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Motorcycles</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18630">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Motorcycles & Scooters</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18628">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Parts</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18629">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Scooters</option>' +
+	'<option class="cat2-lvl2 cat-lvl2" value="18375">&nbsp;&nbsp;&nbsp;&nbsp;Other Automotive</option>' +
+	'<option class="cat2-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Parts & Accessories</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18473">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Audio, GPS, & Car Alarms</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18474">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Auto Body parts</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18479">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Brakes & Suspension</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18475">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Engine, Engine Parts & Transmission</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18480">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Oil, Coolant & Liquids</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18478">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Parts & Accessories</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18481">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Truck Parts</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18476">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wheels, Tyres & Rims</option>' +
+	'<option class="cat2-lvl3 cat-lvl3" value="18482">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wrecking</option>' +
+	'<option class="cat2-lvl2 cat-lvl2" value="20037">&nbsp;&nbsp;&nbsp;&nbsp;Trailers</option>' +
+	'<option class="cat3-lvl1 cat-lvl1" disabled="disabled">Baby & Children</option>' +
+	'<option class="cat3-lvl2 cat-lvl2" value="18577">&nbsp;&nbsp;&nbsp;&nbsp;Baby Carriers</option>' +
+	'<option class="cat3-lvl2 cat-lvl2" value="18578">&nbsp;&nbsp;&nbsp;&nbsp;Baby Clothing</option>' +
+	'<option class="cat3-lvl2 cat-lvl2" value="18579">&nbsp;&nbsp;&nbsp;&nbsp;Baths</option>' +
+	'<option class="cat3-lvl2 cat-lvl2" value="18580">&nbsp;&nbsp;&nbsp;&nbsp;Cots & Bedding</option>' +
+	'<option class="cat3-lvl2 cat-lvl2" value="18581">&nbsp;&nbsp;&nbsp;&nbsp;Feeding</option>' +
+	'<option class="cat3-lvl2 cat-lvl2" value="18585">&nbsp;&nbsp;&nbsp;&nbsp;Toys - Indoor</option>' +
+	'<option class="cat3-lvl2 cat-lvl2" value="20042">&nbsp;&nbsp;&nbsp;&nbsp;Kids Clothing</option>' +
+	'<option class="cat3-lvl2 cat-lvl2" value="18582">&nbsp;&nbsp;&nbsp;&nbsp;Maternity Clothing</option>' +
+	'<option class="cat3-lvl2 cat-lvl2" value="18584">&nbsp;&nbsp;&nbsp;&nbsp;Other Baby & Children</option>' +
+	'<option class="cat3-lvl2 cat-lvl2" value="18586">&nbsp;&nbsp;&nbsp;&nbsp;Toys - Outdoor</option>' +
+	'<option class="cat3-lvl2 cat-lvl2" value="18583">&nbsp;&nbsp;&nbsp;&nbsp;Prams & Strollers</option>' +
+	'<option class="cat4-lvl1 cat-lvl1" disabled="disabled">Boats & Jet Skis</option>' +
+	'<option class="cat4-lvl2 cat-lvl2" value="20004">&nbsp;&nbsp;&nbsp;&nbsp;Boat Accessories & Parts</option>' +
+	'<option class="cat4-lvl2 cat-lvl2" value="20024">&nbsp;&nbsp;&nbsp;&nbsp;Jet Skis</option>' +
+	'<option class="cat4-lvl2 cat-lvl2" value="20025">&nbsp;&nbsp;&nbsp;&nbsp;Kayaks & Paddle</option>' +
+	'<option class="cat4-lvl2 cat-lvl2" value="20026">&nbsp;&nbsp;&nbsp;&nbsp;Motorboats & Powerboats</option>' +
+	'<option class="cat4-lvl2 cat-lvl2" value="20027">&nbsp;&nbsp;&nbsp;&nbsp;Other Boats & Jet Skis</option>' +
+	'<option class="cat4-lvl2 cat-lvl2" value="20028">&nbsp;&nbsp;&nbsp;&nbsp;Sail Boats</option>' +
+	'<option class="cat4-lvl2 cat-lvl2" value="20029">&nbsp;&nbsp;&nbsp;&nbsp;Tinnies & Dinghies</option>' +
+	'<option class="cat5-lvl1 cat-lvl1" disabled="disabled">Books, Music & Games</option>' +
+	'<option class="cat5-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Books</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="20044">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Books</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18587">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Children\\\'s Books</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18588">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Comic Books</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18589">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fiction Books</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18590">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Graphic Novels</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18591">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Magazines</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18592">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nonfiction Books</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18593">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Textbooks</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18594">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Travel Guides</option>' +
+	'<option class="cat5-lvl2 cat-lvl2" value="18307">&nbsp;&nbsp;&nbsp;&nbsp;CDs & DVDs</option>' +
+	'<option class="cat5-lvl2 cat-lvl2" value="18595">&nbsp;&nbsp;&nbsp;&nbsp;Board Games</option>' +
+	'<option class="cat5-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Musical Instruments</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18612">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DJ Gear & Lighting</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18608">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Guitars & Amps</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18613">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Instrument Accessories</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18609">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyboards & Pianos</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18614">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Musical Instruments</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18610">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Percussion & Drums</option>' +
+	'<option class="cat5-lvl3 cat-lvl3" value="18611">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Woodwind & Brass</option>' +
+	'<option class="cat5-lvl2 cat-lvl2" value="18596">&nbsp;&nbsp;&nbsp;&nbsp;Other Books, Music & Games</option>' +
+	'<option class="cat6-lvl1 cat-lvl1" disabled="disabled">Business Services</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="20010">&nbsp;&nbsp;&nbsp;&nbsp;Appliance & Phone Repair</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18461">&nbsp;&nbsp;&nbsp;&nbsp;Automotive</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Building & Trades</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18634">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Airconditioning & Heating</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18635">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carpentry</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="20014">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Concreting & Paving</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18636">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cleaning</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18637">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Electrical</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="20015">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fencing & Gates</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="20016">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Flooring</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="20017">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Handymen</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18638">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Landscaping & Gardening</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18642">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Building & Trades</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18639">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Painting & Decorating</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18640">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Plastering & Tiling</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18641">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Plumbing</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="20030">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Roofing</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18465">&nbsp;&nbsp;&nbsp;&nbsp;Childcare & Nanny</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18442">&nbsp;&nbsp;&nbsp;&nbsp;Cleaning</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18358">&nbsp;&nbsp;&nbsp;&nbsp;Computer, Telecom & Freelance</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18446">&nbsp;&nbsp;&nbsp;&nbsp;Courses & Training</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="20013">&nbsp;&nbsp;&nbsp;&nbsp;Dress Making & Alterations</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18443">&nbsp;&nbsp;&nbsp;&nbsp;Entertainment</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18469">&nbsp;&nbsp;&nbsp;&nbsp;Graphic & Web Design</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Health & Beauty</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18644">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alternative Therapies</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18645">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Beauty Treatments</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18646">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hairdressing</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18647">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Massages</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18648">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Health & Beauty</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18445">&nbsp;&nbsp;&nbsp;&nbsp;Landscaping & Gardening</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18466">&nbsp;&nbsp;&nbsp;&nbsp;Language & Tutoring</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="20009">&nbsp;&nbsp;&nbsp;&nbsp;Mechanics & Garages</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18472">&nbsp;&nbsp;&nbsp;&nbsp;Musicians & Artists</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18360">&nbsp;&nbsp;&nbsp;&nbsp;Other Business Services</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18447">&nbsp;&nbsp;&nbsp;&nbsp;Party & Catering</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18444">&nbsp;&nbsp;&nbsp;&nbsp;Personal Training</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Pet Services</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="20019">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Grooming</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="18439">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Pet Services</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="20020">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sitting</option>' +
+	'<option class="cat6-lvl3 cat-lvl3" value="20021">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Training</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18448">&nbsp;&nbsp;&nbsp;&nbsp;Photography & Video</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18467">&nbsp;&nbsp;&nbsp;&nbsp;Real Estate</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18643">&nbsp;&nbsp;&nbsp;&nbsp;Removals & Storage</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18449">&nbsp;&nbsp;&nbsp;&nbsp;Resume</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18451">&nbsp;&nbsp;&nbsp;&nbsp;Tax, Insurance & Financial</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18453">&nbsp;&nbsp;&nbsp;&nbsp;Taxi, Chauffeur & Airport Transfer</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18452">&nbsp;&nbsp;&nbsp;&nbsp;Travel Agent</option>' +
+	'<option class="cat6-lvl2 cat-lvl2" value="18455">&nbsp;&nbsp;&nbsp;&nbsp;Wedding & Venues</option>' +
+	'<option class="cat7-lvl1 cat-lvl1" disabled="disabled">Clothing & Jewellery</option>' +
+	'<option class="cat7-lvl2 cat-lvl2" value="18575">&nbsp;&nbsp;&nbsp;&nbsp;Accessories</option>' +
+	'<option class="cat7-lvl2 cat-lvl2" value="18574">&nbsp;&nbsp;&nbsp;&nbsp;Bags</option>' +
+	'<option class="cat7-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Jewellery</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="18603">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Men\\\'s Jewellery</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="18606">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Jewellery</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="18604">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unisex Jewellery</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="18605">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Watches</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="18602">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Women\\\'s Jewellery</option>' +
+	'<option class="cat7-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Men\\\'s Clothing</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20054">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jackets & Coats</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20058">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Men\\\'s Clothing</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20055">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pants & Jeans</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20056">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Swimwear</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20057">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tops</option>' +
+	'<option class="cat7-lvl2 cat-lvl2" value="18573">&nbsp;&nbsp;&nbsp;&nbsp;Men\\\'s Shoes</option>' +
+	'<option class="cat7-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Women\\\'s Clothing</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="18576">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Women\\\'s Clothing</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20048">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dresses & Skirts</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20047">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jackets & Coats</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20049">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pants & Jeans</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20050">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Socks & Underwear</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20051">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Swimwear</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20052">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tops & Blouses</option>' +
+	'<option class="cat7-lvl3 cat-lvl3" value="20053">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wedding</option>' +
+	'<option class="cat7-lvl2 cat-lvl2" value="18572">&nbsp;&nbsp;&nbsp;&nbsp;Women\\\'s Shoes</option>' +
+	'<option class="cat8-lvl1 cat-lvl1" disabled="disabled">Community</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="18324">&nbsp;&nbsp;&nbsp;&nbsp;Activities & Hobbies</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="18325">&nbsp;&nbsp;&nbsp;&nbsp;Classes</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="20000">&nbsp;&nbsp;&nbsp;&nbsp;Dance Partners</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="18483">&nbsp;&nbsp;&nbsp;&nbsp;Events</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="18486">&nbsp;&nbsp;&nbsp;&nbsp;Garage Sale</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="18330">&nbsp;&nbsp;&nbsp;&nbsp;Language Swap</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="18326">&nbsp;&nbsp;&nbsp;&nbsp;Lost & Found</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="18441">&nbsp;&nbsp;&nbsp;&nbsp;Missed Connections</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="18327">&nbsp;&nbsp;&nbsp;&nbsp;Musicians & Artists</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="18333">&nbsp;&nbsp;&nbsp;&nbsp;Other Community</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="18331">&nbsp;&nbsp;&nbsp;&nbsp;Sports Partners</option>' +
+	'<option class="cat8-lvl2 cat-lvl2" value="18332">&nbsp;&nbsp;&nbsp;&nbsp;Rideshare & Travel Partners</option>' +
+	'<option class="cat9-lvl1 cat-lvl1" disabled="disabled">Electronics & Computer</option>' +
+	'<option class="cat9-lvl2 cat-lvl2" value="18625">&nbsp;&nbsp;&nbsp;&nbsp;Audio</option>' +
+	'<option class="cat9-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Cameras</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18622">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Digital Camera Accessories</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18621">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Digital Cameras</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18623">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Non Digital Cameras</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18624">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Cameras</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18620">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Video Camera Accessories</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18619">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Video Cameras</option>' +
+	'<option class="cat9-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Computers & Software</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18552">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Components</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18551">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Desktops</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18554">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Laptop Accessories</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18553">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Laptops</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18558">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Computers & Software</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18555">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Printers</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18556">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Software</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18557">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Speakers</option>' +
+	'<option class="cat9-lvl2 cat-lvl2" value="20046">&nbsp;&nbsp;&nbsp;&nbsp;Other Electronics & Computers</option>' +
+	'<option class="cat9-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Phones</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18599">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Home Phones</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18598">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mobile Phone Accessories</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18597">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mobile Phones</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18600">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Phones</option>' +
+	'<option class="cat9-lvl2 cat-lvl2" value="18316">&nbsp;&nbsp;&nbsp;&nbsp;TV & DVD players</option>' +
+	'<option class="cat9-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Video Games & Consoles</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18616">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Accessories</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18617">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Consoles</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18618">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Video Games & Consoles</option>' +
+	'<option class="cat9-lvl3 cat-lvl3" value="18615">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Video Games</option>' +
+	'<option class="cat10-lvl1 cat-lvl1" disabled="disabled">Tickets</option>' +
+	'<option class="cat10-lvl2 cat-lvl2" value="20001">&nbsp;&nbsp;&nbsp;&nbsp;Bus, Train & Plane</option>' +
+	'<option class="cat10-lvl2 cat-lvl2" value="18484">&nbsp;&nbsp;&nbsp;&nbsp;Concerts</option>' +
+	'<option class="cat10-lvl2 cat-lvl2" value="18488">&nbsp;&nbsp;&nbsp;&nbsp;Other Tickets</option>' +
+	'<option class="cat10-lvl2 cat-lvl2" value="18485">&nbsp;&nbsp;&nbsp;&nbsp;Sport</option>' +
+	'<option class="cat10-lvl2 cat-lvl2" value="20002">&nbsp;&nbsp;&nbsp;&nbsp;Theatre/Film</option>' +
+	'<option class="cat11-lvl1 cat-lvl1" disabled="disabled">Home & Garden</option>' +
+	'<option class="cat11-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Appliances</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20059">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cooktops & Rangehoods</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20060">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dishwashers</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20061">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fridges & Freezers</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20062">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Air Conditioning & Heating</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="18402">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Appliances</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20063">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ovens</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20064">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Small Appliances</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20065">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Vaccum Cleaners</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20066">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Washing Machines & Dryers</option>' +
+	'<option class="cat11-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Garden</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20067">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BBQ</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20068">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lawn Mowers</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20069">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Garden</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20070">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Outdoor Setting</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20071">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pool</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20072">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sheds</option>' +
+	'<option class="cat11-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Furniture</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20074">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Beds</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20075">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Chairs</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20076">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Desks</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20077">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mirrors</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20078">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Furniture</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20079">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sofas</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20080">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tables</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20081">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wardrobes</option>' +
+	'<option class="cat11-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Home Decor</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20083">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Manchester</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20084">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Curtains & Blinds</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20085">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lights & Lamps</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20086">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Soft Furnishings</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20087">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rugs & Carpets</option>' +
+	'<option class="cat11-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Tools & DIY</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20090">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hand Tools</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20091">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ladders & Scaffholding</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20092">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Tools & DIY</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20093">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Power Tools</option>' +
+	'<option class="cat11-lvl3 cat-lvl3" value="20094">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tool Storage & Benches</option>' +
+	'<option class="cat11-lvl2 cat-lvl2" value="18403">&nbsp;&nbsp;&nbsp;&nbsp;Other Home & Garden</option>' +
+	'<option class="cat12-lvl1 cat-lvl1" disabled="disabled">Jobs</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Construction & Trades</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18501">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Architecture</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18502">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Building Maintenance</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18504">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Engineering</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18505">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Construction & Trades</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18503">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tradesmen & Labour</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18491">&nbsp;&nbsp;&nbsp;&nbsp;Sales & Call Centres</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18384">&nbsp;&nbsp;&nbsp;&nbsp;Farming & Veterinary</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18299">&nbsp;&nbsp;&nbsp;&nbsp;Finance</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18385">&nbsp;&nbsp;&nbsp;&nbsp;Gardening & Landscaping</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18470">&nbsp;&nbsp;&nbsp;&nbsp;Graphic & Web Design</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18464">&nbsp;&nbsp;&nbsp;&nbsp;Health,Sports & Beauty</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18348">&nbsp;&nbsp;&nbsp;&nbsp;Healthcare & Nursing</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Hospitality</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18492">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bar Staff</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="20032">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Baristas</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18343">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Chefs & Cooks</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18493">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Concierge</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="20033">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Management</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="20034">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kitchen Hand</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18495">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Hospitality</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18494">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Waiting Staff</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18386">&nbsp;&nbsp;&nbsp;&nbsp;Housekeeping</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18344">&nbsp;&nbsp;&nbsp;&nbsp;IT</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="20036">&nbsp;&nbsp;&nbsp;&nbsp;Real Estate & Housing</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="20035">&nbsp;&nbsp;&nbsp;&nbsp;Legal</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18463">&nbsp;&nbsp;&nbsp;&nbsp;Moving & Removals</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" disabled="disabled">&nbsp;&nbsp;&nbsp;&nbsp;Nanny & Babysitting</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18496">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Live-in Nannies</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18497">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Live-out Nannies</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18498">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maternity Nurse</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18499">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nanny Share</option>' +
+	'<option class="cat12-lvl3 cat-lvl3" value="18500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other Nanny & Babysitting</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18351">&nbsp;&nbsp;&nbsp;&nbsp;Office</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18347">&nbsp;&nbsp;&nbsp;&nbsp;Other Jobs</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18387">&nbsp;&nbsp;&nbsp;&nbsp;Recruitment & HR</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18353">&nbsp;&nbsp;&nbsp;&nbsp;Retail</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18354">&nbsp;&nbsp;&nbsp;&nbsp;Sales & Marketing</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18388">&nbsp;&nbsp;&nbsp;&nbsp;Sports & Healthclub</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18355">&nbsp;&nbsp;&nbsp;&nbsp;Teaching & Childcare</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18428">&nbsp;&nbsp;&nbsp;&nbsp;Training & Development</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18490">&nbsp;&nbsp;&nbsp;&nbsp;Transport & Logistics</option>' +
+	'<option class="cat12-lvl2 cat-lvl2" value="18489">&nbsp;&nbsp;&nbsp;&nbsp;Volunteer</option>' +
+	'<option class="cat13-lvl1 cat-lvl1" value="18319">Miscellaneous Goods</option>' +
+	'<option class="cat14-lvl1 cat-lvl1" disabled="disabled">Pets</option>' +
+	'<option class="cat14-lvl2 cat-lvl2" value="18456">&nbsp;&nbsp;&nbsp;&nbsp;Birds</option>' +
+	'<option class="cat14-lvl2 cat-lvl2" value="18435">&nbsp;&nbsp;&nbsp;&nbsp;Cats & Kittens</option>' +
+	'<option class="cat14-lvl2 cat-lvl2" value="18434">&nbsp;&nbsp;&nbsp;&nbsp;Dogs & Puppies</option>' +
+	'<option class="cat14-lvl2 cat-lvl2" value="20022">&nbsp;&nbsp;&nbsp;&nbsp;Fish</option>' +
+	'<option class="cat14-lvl2 cat-lvl2" value="18632">&nbsp;&nbsp;&nbsp;&nbsp;Horses & Ponies</option>' +
+	'<option class="cat14-lvl2 cat-lvl2" value="18457">&nbsp;&nbsp;&nbsp;&nbsp;Livestock</option>' +
+	'<option class="cat14-lvl2 cat-lvl2" value="18437">&nbsp;&nbsp;&nbsp;&nbsp;Lost & Found</option>' +
+	'<option class="cat14-lvl2 cat-lvl2" value="18436">&nbsp;&nbsp;&nbsp;&nbsp;Other Pets</option>' +
+	'<option class="cat14-lvl2 cat-lvl2" value="18438">&nbsp;&nbsp;&nbsp;&nbsp;Pet Products</option>' +
+	'<option class="cat14-lvl2 cat-lvl2" value="20023">&nbsp;&nbsp;&nbsp;&nbsp;Rabbits</option>' +
+	'<option class="cat14-lvl2 cat-lvl2" value="18649">&nbsp;&nbsp;&nbsp;&nbsp;Reptiles & Amphibians</option>' +
+	'<option class="cat15-lvl1 cat-lvl1" disabled="disabled">Real Estate</option>' +
+	'<option class="cat15-lvl2 cat-lvl2" value="18468">&nbsp;&nbsp;&nbsp;&nbsp;Business For Sale</option>' +
+	'<option class="cat15-lvl2 cat-lvl2" value="18363">&nbsp;&nbsp;&nbsp;&nbsp;Couchsurfing</option>' +
+	'<option class="cat15-lvl2 cat-lvl2" value="20031">&nbsp;&nbsp;&nbsp;&nbsp;Land For Sale</option>' +
+	'<option class="cat15-lvl2 cat-lvl2" value="18365">&nbsp;&nbsp;&nbsp;&nbsp;Office Space & Commercial</option>' +
+	'<option class="cat15-lvl2 cat-lvl2" value="18302">&nbsp;&nbsp;&nbsp;&nbsp;Other Real Estate</option>' +
+	'<option class="cat15-lvl2 cat-lvl2" value="18366">&nbsp;&nbsp;&nbsp;&nbsp;Parking & Storage</option>' +
+	'<option class="cat15-lvl2 cat-lvl2" value="18367">&nbsp;&nbsp;&nbsp;&nbsp;Property For Sale</option>' +
+	'<option class="cat15-lvl2 cat-lvl2" value="18364">&nbsp;&nbsp;&nbsp;&nbsp;Property for Rent</option>' +
+	'<option class="cat15-lvl2 cat-lvl2" value="18511">&nbsp;&nbsp;&nbsp;&nbsp;Roomshare</option>' +
+	'<option class="cat15-lvl2 cat-lvl2" value="18294">&nbsp;&nbsp;&nbsp;&nbsp;Flatshare & Houseshare</option>' +
+	'<option class="cat15-lvl2 cat-lvl2" value="18295">&nbsp;&nbsp;&nbsp;&nbsp;Short Term</option>' +
+	'<option class="cat16-lvl1 cat-lvl1" disabled="disabled">Sport & Fitness</option>' +
+	'<option class="cat16-lvl2 cat-lvl2" value="18560">&nbsp;&nbsp;&nbsp;&nbsp;Bicycles</option>' +
+	'<option class="cat16-lvl2 cat-lvl2" value="18561">&nbsp;&nbsp;&nbsp;&nbsp;Boxing & Martial Arts</option>' +
+	'<option class="cat16-lvl2 cat-lvl2" value="18562">&nbsp;&nbsp;&nbsp;&nbsp;Camping & Hiking</option>' +
+	'<option class="cat16-lvl2 cat-lvl2" value="18563">&nbsp;&nbsp;&nbsp;&nbsp;Fishing</option>' +
+	'<option class="cat16-lvl2 cat-lvl2" value="18564">&nbsp;&nbsp;&nbsp;&nbsp;Golf</option>' +
+	'<option class="cat16-lvl2 cat-lvl2" value="18565">&nbsp;&nbsp;&nbsp;&nbsp;Gym & Fitness</option>' +
+	'<option class="cat16-lvl2 cat-lvl2" value="18566">&nbsp;&nbsp;&nbsp;&nbsp;Sports Bags</option>' +
+	'<option class="cat16-lvl2 cat-lvl2" value="18569">&nbsp;&nbsp;&nbsp;&nbsp;Other Sports & Fitness</option>' +
+	'<option class="cat16-lvl2 cat-lvl2" value="18559">&nbsp;&nbsp;&nbsp;&nbsp;Racket Sports</option>' +
+	'<option class="cat16-lvl2 cat-lvl2" value="18567">&nbsp;&nbsp;&nbsp;&nbsp;Skateboards & Rollerblades</option>' +
+	'<option class="cat16-lvl2 cat-lvl2" value="18568">&nbsp;&nbsp;&nbsp;&nbsp;Surfing</option>';
 
 // In order to the category box HTML, we must swap in our version at the correct time.
 // This must happen before manageAds.js is run, because it pulls Belen.tns.controller.vars inside an enclosure.
@@ -298,34 +349,34 @@ function setCatSelectOpts(evt) {
 		// Pretty colours generated using hand-picked hues beginning here:
 		// http://tristen.ca/hcl-picker/#/clh/6/0/6C2E23/FEC7A9
 		newStyleText +=
-			".cat1-lvl1,.cat2-lvl1 { background-color: #8F4738; }\n" +
-			".cat3-lvl1            { background-color: #7C5320; }\n" +
-			".cat4-lvl1            { background-color: #5D5F1E; }\n" +
-			".cat5-lvl1            { background-color: #236845; }\n" +
-			".cat6-lvl1            { background-color: #2C627A; }\n" +
-			".cat7-lvl1            { background-color: #545A7C; }\n" +
-			".cat8-lvl1            { background-color: #6B5377; }\n" +
-			".cat9-lvl1            { background-color: #8D4557; }\n\n";
+			".cat1-lvl1,.cat9-lvl1  { background-color: #8F4738; }\n" +
+			".cat2-lvl1,.cat10-lvl1 { background-color: #7C5320; }\n" +
+			".cat3-lvl1,.cat11-lvl1 { background-color: #5D5F1E; }\n" +
+			".cat4-lvl1,.cat12-lvl1 { background-color: #236845; }\n" +
+			".cat5-lvl1,.cat13-lvl1 { background-color: #2C627A; }\n" +
+			".cat6-lvl1,.cat14-lvl1 { background-color: #545A7C; }\n" +
+			".cat7-lvl1,.cat15-lvl1 { background-color: #6B5377; }\n" +
+			".cat8-lvl1,.cat16-lvl1 { background-color: #8D4557; }\n\n";
 
 		newStyleText +=
-			".cat1-lvl2,.cat2-lvl2 { background-color: #E8A388; }\n" +
-			".cat3-lvl2            { background-color: #D8AB76; }\n" +
-			".cat4-lvl2            { background-color: #BEB575; }\n" +
-			".cat5-lvl2            { background-color: #96BD93; }\n" +
-			".cat6-lvl2            { background-color: #A0B7BF; }\n" +
-			".cat7-lvl2            { background-color: #B8B0C1; }\n" +
-			".cat8-lvl2            { background-color: #C8ABBC; }\n" +
-			".cat9-lvl2            { background-color: #E5A2A2; }\n\n";
+			".cat1-lvl2,.cat9-lvl2  { background-color: #E8A388; }\n" +
+			".cat2-lvl2,.cat10-lvl2 { background-color: #D8AB76; }\n" +
+			".cat3-lvl2,.cat11-lvl2 { background-color: #BEB575; }\n" +
+			".cat4-lvl2,.cat12-lvl2 { background-color: #96BD93; }\n" +
+			".cat5-lvl2,.cat13-lvl2 { background-color: #A0B7BF; }\n" +
+			".cat6-lvl2,.cat14-lvl2 { background-color: #B8B0C1; }\n" +
+			".cat7-lvl2,.cat15-lvl2 { background-color: #C8ABBC; }\n" +
+			".cat8-lvl2,.cat16-lvl2 { background-color: #E5A2A2; }\n\n";
 
 		newStyleText +=
-			".cat1-lvl3,.cat2-lvl3 { background-color: #FEC7A9; }\n" +
-			".cat3-lvl3            { background-color: #F3CC9D; }\n" +
-			".cat4-lvl3            { background-color: #E0D39C; }\n" +
-			".cat5-lvl3            { background-color: #C6D9B0; }\n" +
-			".cat6-lvl3            { background-color: #CDD4CF; }\n" +
-			".cat7-lvl3            { background-color: #DDCFD0; }\n" +
-			".cat8-lvl3            { background-color: #E8CCCD; }\n" +
-			".cat9-lvl3            { background-color: #FCC6BB; }";
+			".cat1-lvl3,.cat9-lvl3  { background-color: #FEC7A9; }\n" +
+			".cat2-lvl3,.cat10-lvl3 { background-color: #F3CC9D; }\n" +
+			".cat3-lvl3,.cat11-lvl3 { background-color: #E0D39C; }\n" +
+			".cat4-lvl3,.cat12-lvl3 { background-color: #C6D9B0; }\n" +
+			".cat5-lvl3,.cat13-lvl3 { background-color: #CDD4CF; }\n" +
+			".cat6-lvl3,.cat14-lvl3 { background-color: #DDCFD0; }\n" +
+			".cat7-lvl3,.cat15-lvl3 { background-color: #E8CCCD; }\n" +
+			".cat8-lvl3,.cat16-lvl3 { background-color: #FCC6BB; }";
 			
 		newStyle.appendChild(document.createTextNode(newStyleText));
 
